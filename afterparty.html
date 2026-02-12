@@ -1,290 +1,262 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>The Warehouse After Party - $5 Off with Love Hurts</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Warehouse After Party</title>
 
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
 
-    :root{
-      --overlay: rgba(0,0,0,.58);
-      --overlay-2: rgba(0,0,0,.28);
-      --pink: #ff1493;
-      --cyan: #00ffff;
-      --yellow:#ffff00;
-      --purple:#9b59ff;
-    }
+:root{
+  --pink:#ff1493;
+  --cyan:#00ffff;
+  --yellow:#ffff00;
+  --purple:#9b59ff;
+}
 
-    body{
-      min-height: 100vh;
-      font-family: Arial, sans-serif;
-      color: #fff;
-      overflow-x: hidden;
-      overflow-y: auto;
-      position: relative;
-      background: #000;
-    }
+body{
+  min-height:100vh;
+  font-family:Arial, sans-serif;
+  color:#fff;
+  overflow-x:hidden;
+  position:relative;
+  background:#000;
+}
 
-    /* ✅ IMMERSIVE FULLSCREEN BACKGROUND (hosted online) */
-    body::before{
-      content:"";
-      position: fixed;
-      inset: 0;
-      z-index: 0;
+/* 🔥 IMMERSIVE BACKGROUND - Canva Design */
+#bgContainer{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  filter:hue-rotate(0deg) saturate(1.3) contrast(1.2) brightness(1.1);
+  animation:bgTrippy 10s infinite;
+}
 
-      /* Replace with your hosted URL */
-      background-image: url("https://YOUR-DOMAIN.com/path/amigo-del-tio-flyer.png");
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
+#bgContainer iframe{
+  width:100%;
+  height:100%;
+  border:none;
+}
 
-      /* Subtle motion for immersion */
-      transform: scale(1.08);
-      animation: bgDrift 18s ease-in-out infinite alternate;
+@keyframes bgTrippy{
+  0%{filter:hue-rotate(0deg) saturate(1.3) contrast(1.2) brightness(1.1);}
+  25%{filter:hue-rotate(90deg) saturate(1.6) contrast(1.4) brightness(1.2);}
+  50%{filter:hue-rotate(180deg) saturate(1) contrast(0.95) brightness(0.9);}
+  75%{filter:hue-rotate(270deg) saturate(1.5) contrast(1.3) brightness(1.15);}
+  100%{filter:hue-rotate(360deg) saturate(1.3) contrast(1.2) brightness(1.1);}
+}
 
-      /* Small cinematic soften */
-      filter: saturate(1.15) contrast(1.05) brightness(.95);
-      will-change: transform;
-    }
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:1;
 
-    /* ✅ Dark + color overlay so text always reads */
-    body::after{
-      content:"";
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      background:
-        radial-gradient(1200px 700px at 50% 20%, rgba(0,255,255,.18), transparent 55%),
-        radial-gradient(900px 600px at 15% 85%, rgba(255,20,147,.18), transparent 60%),
-        linear-gradient(180deg, var(--overlay), var(--overlay-2));
-      pointer-events: none;
-    }
+  background-image:
+    linear-gradient(45deg, rgba(255,20,147,.08), transparent 50%),
+    radial-gradient(circle at center, rgba(0,255,255,.1), transparent 60%);
+  animation:psychedelicOverlay 4s infinite;
+  pointer-events:none;
+}
 
-    @keyframes bgDrift{
-      0%   { transform: scale(1.08) translate3d(0,0,0); }
-      50%  { transform: scale(1.12) translate3d(-1.2%, -1.1%, 0); }
-      100% { transform: scale(1.10) translate3d(1.0%, 0.8%, 0); }
-    }
+/* 🌀 Glitch & Scanline Effects */
+@keyframes psychedelicOverlay{
+  0%{opacity:.1;filter:hue-rotate(0deg) blur(0px);}
+  25%{opacity:.25;filter:hue-rotate(90deg) blur(1px);}
+  50%{opacity:.15;filter:hue-rotate(180deg) blur(0.5px);}
+  75%{opacity:.2;filter:hue-rotate(270deg) blur(1px);}
+  100%{opacity:.1;filter:hue-rotate(360deg) blur(0px);}
+}
 
-    /* ✅ Optional “vignette” for a club-poster feel */
-    .vignette{
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      background: radial-gradient(circle at center, rgba(0,0,0,0) 45%, rgba(0,0,0,.55) 100%);
-      mix-blend-mode: multiply;
-    }
+@keyframes bgDrift{
+  0%{transform:scale(1.1) skew(0deg);}
+  25%{transform:scale(1.15) skew(1deg);}
+  50%{transform:scale(1.2) skew(-1deg);}
+  75%{transform:scale(1.15) skew(0.5deg);}
+  100%{transform:scale(1.1) skew(0deg);}
+}
 
-    /* Container */
-    .container{
-      position: relative;
-      z-index: 1;
-      max-width: 600px;
-      margin: 40px auto;
-      padding: 30px;
-      border-radius: 20px;
+/* Scanline effect */
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:0;
+  background:repeating-linear-gradient(0deg, rgba(0,255,255,.03) 0px, transparent 1px, transparent 2px);
+  animation:scanlines 0.1s linear infinite;
+  pointer-events:none;
+}
 
-      background: rgba(0, 0, 0, 0.72);
-      border: 3px solid var(--pink);
-      box-shadow: 0 0 60px rgba(255, 20, 147, 0.8), inset 0 0 30px rgba(255, 20, 147, 0.2);
-      animation: pulseBorder 2s infinite;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
+@keyframes scanlines{
+  0%{transform:translateY(0);}
+  100%{transform:translateY(10px);}
+}
 
-    @keyframes pulseBorder{
-      0%,100%{ box-shadow: 0 0 60px rgba(255,20,147,.8), inset 0 0 30px rgba(255,20,147,.2); }
-      50%{ box-shadow: 0 0 90px rgba(0,255,255,.75), inset 0 0 30px rgba(0,255,255,.2); }
-    }
+/* Container */
+.container{
+  position:relative;
+  z-index:1;
+  max-width:600px;
+  margin:40px auto;
+  padding:30px;
+  border-radius:20px;
+  background:rgba(0,0,0,.75);
+  border:3px solid var(--pink);
+  box-shadow:0 0 60px rgba(255,20,147,.8);
+  backdrop-filter:blur(12px);
+  animation:containerPulse 3s ease-in-out infinite;
+}
 
-    h1{
-      font-size: 48px;
-      margin-bottom: 10px;
-      text-align: center;
-      background: linear-gradient(90deg, var(--pink), var(--cyan), var(--yellow), var(--pink));
-      background-size: 300% 100%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: textShift 4s linear infinite;
-      text-shadow: 0 0 18px rgba(255,20,147,.18);
-    }
+@keyframes containerPulse{
+  0%,100%{box-shadow:0 0 60px rgba(255,20,147,.8), 0 0 30px rgba(0,255,255,.5);}
+  50%{box-shadow:0 0 80px rgba(255,20,147,1), 0 0 50px rgba(0,255,255,.8);}
+}
 
-    @keyframes textShift{
-      0%{ background-position: 0% 0%; }
-      100%{ background-position: 300% 0%; }
-    }
+h1{
+  font-size:48px;
+  text-align:center;
+  margin-bottom:10px;
+  background:linear-gradient(90deg,var(--pink),var(--cyan),var(--yellow),var(--pink));
+  background-size:300% 100%;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  animation:textTrippy 3s linear infinite, wobble 1.5s infinite;
+}
 
-    .subtitle{
-      text-align: center;
-      font-size: 24px;
-      margin-bottom: 20px;
-      color: var(--cyan);
-      text-shadow: 0 0 10px var(--cyan);
-      animation: glow 2s infinite;
-    }
+@keyframes textTrippy{
+  0%{background-position:0% 0%;}
+  100%{background-position:300% 0%;}
+}
 
-    @keyframes glow{
-      0%,100%{ text-shadow: 0 0 10px var(--cyan), 0 0 20px var(--cyan); }
-      50%{ text-shadow: 0 0 20px var(--pink), 0 0 40px var(--pink); }
-    }
+@keyframes wobble{
+  0%,100%{transform:translateX(0) skewX(0deg);}
+  25%{transform:translateX(-2px) skewX(1deg);}
+  50%{transform:translateX(2px) skewX(-1deg);}
+  75%{transform:translateX(-1px) skewX(0.5deg);}
+}
 
-    .details{
-      margin: 20px 0;
-      font-size: 18px;
-      line-height: 1.8;
-      color: #fff;
-    }
+.subtitle{
+  text-align:center;
+  font-size:24px;
+  margin-bottom:20px;
+  color:var(--cyan);
+}
 
-    .detail-row{
-      padding: 10px;
-      margin: 10px 0;
-      background: rgba(255, 20, 147, 0.12);
-      border-left: 4px solid var(--cyan);
-      border-radius: 10px;
-      animation: slideIn 0.5s ease-out forwards;
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-    }
+.detail-row{
+  padding:10px;
+  margin:10px 0;
+  background:rgba(255,20,147,.12);
+  border-left:4px solid var(--cyan);
+  border-radius:8px;
+  animation:chromatic 2s ease-in-out infinite;
+}
 
-    @keyframes slideIn{
-      from{ opacity: 0; transform: translateX(-20px); }
-      to{ opacity: 1; transform: translateX(0); }
-    }
+@keyframes chromatic{
+  0%,100%{transform:translateX(0) skewY(0deg); filter:drop-shadow(0 0 5px rgba(0,255,255,.6));}
+  50%{transform:translateX(1px) skewY(0.5deg); filter:drop-shadow(1px 0 8px rgba(255,20,147,.8)) drop-shadow(-1px 0 8px rgba(0,255,255,.8));}
+}
 
-    .detail-row:nth-child(1){ animation-delay: 0.08s; }
-    .detail-row:nth-child(2){ animation-delay: 0.16s; }
-    .detail-row:nth-child(3){ animation-delay: 0.24s; }
-    .detail-row:nth-child(4){ animation-delay: 0.32s; }
+.offer{
+  text-align:center;
+  font-size:26px;
+  font-weight:bold;
+  margin:30px 0;
+  padding:20px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  background-size:200% 200%;
+  border-radius:15px;
+  border:2px solid var(--cyan);
+  animation:offerTrippy 3s ease infinite, offerGlow 2s ease-in-out infinite;
+}
 
-    .offer{
-      text-align: center;
-      font-size: 28px;
-      font-weight: bold;
-      margin: 30px 0;
-      padding: 20px;
-      background: linear-gradient(135deg, var(--pink), var(--purple));
-      border-radius: 15px;
-      border: 2px solid var(--cyan);
-      animation: offerPulse 1.5s infinite;
-      box-shadow: 0 0 40px rgba(0,255,255,.18);
-    }
+@keyframes offerTrippy{
+  0%{background-position:0% 0%; transform:perspective(500px) rotateX(0deg);}
+  25%{background-position:100% 0%; transform:perspective(500px) rotateX(2deg);}
+  50%{background-position:0% 100%; transform:perspective(500px) rotateX(0deg);}
+  75%{background-position:100% 100%; transform:perspective(500px) rotateX(-2deg);}
+  100%{background-position:0% 0%; transform:perspective(500px) rotateX(0deg);}
+}
 
-    @keyframes offerPulse{
-      0%,100%{ transform: scale(1); }
-      50%{ transform: scale(1.05); }
-    }
+@keyframes offerGlow{
+  0%,100%{box-shadow:0 0 20px rgba(0,255,255,.5), inset 0 0 20px rgba(255,20,147,.3);}
+  50%{box-shadow:0 0 40px rgba(0,255,255,.8), inset 0 0 30px rgba(255,20,147,.5);}
+}
 
-    .cta-button{
-      display: block;
-      margin: 20px auto;
-      padding: 15px 30px;
-      font-size: 20px;
-      font-weight: bold;
-      color: #fff;
-      background: linear-gradient(135deg, var(--pink), var(--purple));
-      border: 2px solid var(--cyan);
-      border-radius: 999px;
-      cursor: pointer;
-      text-decoration: none;
-      text-align: center;
-      box-shadow: 0 0 30px rgba(255, 20, 147, 0.6);
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-      width: fit-content;
-    }
+.cta-button{
+  display:block;
+  margin:20px auto;
+  padding:15px 30px;
+  font-size:20px;
+  font-weight:bold;
+  color:#fff;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  background-size:200% 200%;
+  border:2px solid var(--cyan);
+  border-radius:50px;
+  text-decoration:none;
+  text-align:center;
+  transition:.3s;
+  animation:buttonTrippy 2s ease infinite, buttonGlow 1.5s ease-in-out infinite;
+}
 
-    .cta-button:hover{
-      transform: scale(1.08);
-      box-shadow: 0 0 60px rgba(0, 255, 255, 0.75);
-    }
+@keyframes buttonTrippy{
+  0%{background-position:0% 0%; transform:scale(1);}
+  25%{background-position:100% 0%; transform:scale(1.05);}
+  50%{background-position:100% 100%; transform:scale(1);}
+  75%{background-position:0% 100%; transform:scale(1.05);}
+  100%{background-position:0% 0%; transform:scale(1);}
+}
 
-    .back-link{
-      text-align: center;
-      margin-top: 30px;
-    }
+@keyframes buttonGlow{
+  0%,100%{box-shadow:0 0 20px rgba(0,255,255,.6), 0 0 10px rgba(255,20,147,.4);}
+  50%{box-shadow:0 0 40px rgba(0,255,255,.8), 0 0 20px rgba(255,20,147,.8), inset 0 0 20px rgba(0,255,255,.3);}
+}
 
-    .back-link a{
-      color: var(--yellow);
-      text-decoration: none;
-      font-size: 16px;
-      animation: blink 1s infinite;
-    }
+.cta-button:hover{
+  transform:scale(1.12) rotate(-1deg);
+  box-shadow:0 0 60px rgba(0,255,255,1), 0 0 30px rgba(255,20,147,1), inset 0 0 30px rgba(0,255,255,.5);
+  filter:brightness(1.3) saturate(1.5);
+}
+}
 
-    @keyframes blink{
-      0%,50%,100%{ opacity: 1; }
-      25%,75%{ opacity: 0.5; }
-    }
-
-    .emoji{
-      display: inline-block;
-      margin: 0 5px;
-      animation: float 3s ease-in-out infinite;
-    }
-
-    @keyframes float{
-      0%,100%{ transform: translateY(0px) rotate(0deg); }
-      50%{ transform: translateY(-10px) rotate(5deg); }
-    }
-
-    /* Mobile tweaks */
-    @media (max-width: 680px){
-      .container{ margin: 18px 12px; padding: 22px; }
-      h1{ font-size: 40px; }
-      .subtitle{ font-size: 20px; }
-      .details{ font-size: 17px; }
-      .offer{ font-size: 24px; }
-    }
-
-    /* Reduce motion accessibility */
-    @media (prefers-reduced-motion: reduce){
-      body::before, h1, .subtitle, .container, .offer, .emoji, .back-link a{
-        animation: none !important;
-      }
-    }
-  </style>
+@media(max-width:680px){
+  h1{font-size:38px;}
+  .container{margin:20px;}
+}
+</style>
 </head>
 
 <body>
-  <div class="vignette"></div>
+<!-- 🔥 Psychedelic Canva Background -->
+<div id="bgContainer">
+  <iframe loading="lazy" src="https://www.canva.com/design/DAHBJst3xkg/dc_0MuwBZ-qejPW4vfh4yw/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen"></iframe>
+</div>
 
-  <div class="container">
-    <h1>🎉 THE WAREHOUSE 🎉</h1>
-    <div class="subtitle">After Party Vibes</div>
+<div class="container">
 
-    <div class="details">
-      <div class="detail-row">
-        <span class="emoji">🌙</span> <strong>Time:</strong> 3AM Until Sunrise
-      </div>
-      <div class="detail-row">
-        <span class="emoji">📍</span> <strong>Location:</strong>
-        <a href="https://thewarehousestpete.com" style="color:#00ffff;">The Warehouse St. Pete</a>
-      </div>
-      <div class="detail-row">
-        <span class="emoji">💰</span> <strong>Door:</strong> $15 Cover
-      </div>
-      <div class="detail-row">
-        <span class="emoji">🎵</span> <strong>Music:</strong> All Night Long!
-      </div>
-    </div>
+<h1>🎉 THE WAREHOUSE 🎉</h1>
+<div class="subtitle">After Party Vibes</div>
 
-    <div class="offer">
-      💘 LOVE HURTS SPECIAL 💘<br />
-      <span style="font-size: 32px;">$5 OFF ENTRY</span><br />
-      Buy 2, Get 1 Free 🍾
-    </div>
+<div class="detail-row">🌙 <strong>Time:</strong> 3AM Until Sunrise</div>
+<div class="detail-row">📍 <strong>Location:</strong> <a href="https://thewarehousestpete.com" style="color:#00ffff;">The Warehouse St. Pete</a></div>
+<div class="detail-row">💰 <strong>Door:</strong> $15 Cover</div>
+<div class="detail-row">🎵 <strong>Music:</strong> All Night Long!</div>
 
-    <p style="text-align:center;font-size:16px;color:#ffff00;margin:20px 0;">
-      ⬆️ Screenshot this page or show the QR code at the door! ⬆️
-    </p>
+<div class="offer">
+💘 LOVE HURTS SPECIAL 💘<br>
+<span style="font-size:32px;">$5 OFF ENTRY</span><br>
+Buy 2, Get 1 Free 🍾
+</div>
 
-    <a href="https://thewarehousestpete.com" class="cta-button">🎉 See Party 🎉</a>
+<a href="https://thewarehousestpete.com" class="cta-button">
+🎉 See Party 🎉
+</a>
 
-    <div class="back-link">
-      <a href="/">← Back to Love Hurts Game</a>
-    </div>
-  </div>
+</div>
 </body>
 </html>
