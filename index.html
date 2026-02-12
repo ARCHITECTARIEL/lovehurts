@@ -101,7 +101,8 @@
         // After-party URL and QR (absolute URL so it works when scanned from phone)
         const afterPartyUrl = window.location.origin + '/afterparty.html';
         function buildQrUrl(url, size=300) {
-            return 'https://chart.googleapis.com/chart?cht=qr&chs=' + size + 'x' + size + '&chl=' + encodeURIComponent(url) + '&chld=L|1';
+            // Using QR Server API (free, reliable, actively maintained)
+            return 'https://api.qrserver.com/v1/create-qr-code/?size=' + size + 'x' + size + '&data=' + encodeURIComponent(url);
         }
 
         // Popups - Event-focused & flirty
