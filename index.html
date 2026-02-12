@@ -72,7 +72,7 @@
                 <p><strong>3AM until Sunrise • $15 at door</strong><br>Show this QR = $5 off! Buy 2 Get 1 Free 🍹</p>
                 <img id="qrImg" src="" alt="QR Code" style="width:260px;height:260px;border-radius:8px;background:white;">
                 <div class="qr-actions">
-                    <button id="copyLinkBtn" class="ghost">Copy Link</button>
+                    <button id="copyLinkBtn" class="ghost">🎉 See Party</button>
                     <button id="downloadQrBtn" class="primary">Download QR</button>
                 </div>
                 <div style="margin-top:10px"><button id="closeQr" class="ghost">Close</button></div>
@@ -147,8 +147,8 @@
         function closeQrModal() { qrModal.style.display = 'none'; }
         infoBtn.addEventListener('click', () => { openQrModal(); });
         closeQr.addEventListener('click', closeQrModal);
-        copyLinkBtn.addEventListener('click', async () => {
-            try { await navigator.clipboard.writeText(afterPartyUrl); showPopup('Link copied to clipboard!'); } catch(e){ showPopup('Copy failed'); }
+        copyLinkBtn.addEventListener('click', () => {
+            window.location.href = afterPartyUrl;
         });
         downloadQrBtn.addEventListener('click', () => {
             const src = buildQrUrl(afterPartyUrl, 1000);
