@@ -11,7 +11,8 @@
         }
         .wrap {
             display: flex; flex-direction: column; align-items: center;
-            padding: 12px; height: 100vh;
+            padding: 12px; height: 100vh; position: relative; z-index: 1;
+            background: rgba(0, 0, 0, 0.4);
         }
         h1 { margin: 8px 0; font-size: 20px; }
         .ui {
@@ -95,6 +96,14 @@
     </style>
 </head>
 <body>
+    <div id="canvaBackground" style="position: fixed; inset: 0; z-index: -1; width: 100%; height: 100%;">
+        <iframe loading="lazy" 
+            style="width: 100%; height: 100%; border: none; padding: 0; margin: 0;"
+            src="https://www.canva.com/design/DAHBChHGCjI/O_Z56ttD_h3b9AqWfAK6Rg/view?embed" 
+            allowfullscreen="allowfullscreen" allow="fullscreen">
+        </iframe>
+    </div>
+    
     <div class="wrap">
         <h1>💔 LOVE HURTS 💔 — Saturday 2/13/26 • Exit Bar 9PM–2AM</h1>
         <div class="ui">
