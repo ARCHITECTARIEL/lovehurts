@@ -232,6 +232,17 @@
 
             document.getElementById('prevBtn').disabled = currentSlide === 0;
             document.getElementById('nextBtn').disabled = currentSlide === scene.length - 1;
+
+            // Auto-advance to next slide after 3 seconds
+            setTimeout(() => {
+                if (currentSlide < scene.length - 1) {
+                    currentSlide++;
+                    displaySlide();
+                } else {
+                    // Last slide - auto close and start game
+                    closeCutscene();
+                }
+            }, 3000);
         }
 
         window.nextSlide = function() {
