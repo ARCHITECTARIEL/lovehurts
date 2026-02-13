@@ -1,329 +1,539 @@
 <!DOCTYPE html>
 <html lang="en">
-<!doctype html>
-<html>
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Love Hurts — Saturday 2/13/26</title>
-        <style>
-            html,body{height:100%;margin:0;background:#111;color:#fff;font-family:Inter,Arial}
-            .wrap{display:flex;flex-direction:column;align-items:center;padding:16px}
-            canvas{background:linear-gradient(#111, #1a1a1a);box-shadow:0 8px 30px rgba(0,0,0,.7);border-radius:8px}
-            .ui{width:800px;display:flex;justify-content:space-between;align-items:center;margin:12px 0}
-            .panel{background:#0b0b0b;padding:8px 12px;border-radius:8px;border:2px solid #2b2b2b}
-            .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.75);z-index:20}
-            .cutscene{width:840px;max-width:92%;background:#fff;color:#000;padding:18px;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.6);display:grid;grid-template-columns:160px 1fr;gap:12px}
-            .cutscene img{width:150px;height:150px;object-fit:cover;border-radius:8px}
-            .cutscene .text{font-size:18px;line-height:1.3}
-            .btn{background:#ff2d95;color:#fff;padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
-            .brand{font-weight:700;color:#ffdd57}
-            .muted{opacity:.8}
-            .small{font-size:13px}
-            .typewriter{font-family:Georgia,serif;font-size:20px}
-        </style>
-    </head>
-    <body>
-        <div class="wrap">
-            <h1>Love Hurts — Saturday 2/13/26 <span class="small muted">Exit Bar • 9PM–2AM</span></h1>
-            <div class="ui">
-                <div class="panel">Lives: <span id="lives">3</span></div>
-                <div class="panel">Level: <span id="level">1</span></div>
-                <div class="panel">Power: <span id="power">Normal</span></div>
-                <div class="panel">Score: <span id="score">0</span></div>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Love Hurts — Saturday 2/13/26</title>
+    <style>
+        html, body {
+            height: 100%; margin: 0; background: #0a0a0a; color: #fff;
+            font-family: 'Arial', sans-serif; overflow: hidden;
+        }
+        .wrap {
+            display: flex; flex-direction: column; align-items: center;
+            padding: 12px; height: 100vh;
+        }
+        h1 { margin: 8px 0; font-size: 20px; }
+        .ui {
+            width: 800px; display: flex; justify-content: space-around;
+            align-items: center; margin: 8px 0; gap: 12px;
+        }
+        .panel {
+            background: rgba(255, 45, 149, 0.2); padding: 6px 12px;
+            border-radius: 6px; border: 1px solid #ff2d95; font-size: 12px;
+        }
+        canvas {
+            background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a0a 100%);
+            box-shadow: 0 0 40px rgba(255, 45, 149, 0.4), inset 0 0 20px rgba(0, 0, 0, 0.8);
+            border: 2px solid #ff2d95; border-radius: 4px;
+        }
+        .controls {
+            width: 800px; text-align: center; font-size: 11px; margin-top: 8px;
+            color: #aaa;
+        }
+        
+        /* Cutscene system */
+        #cutsceneContainer {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.95);
+            display: none; z-index: 100; flex-direction: column;
+            align-items: center; justify-content: center;
+            animation: fadeIn 0.4s ease-out;
+        }
+        #cutsceneContainer.active { display: flex; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .cutscene-slide {
+            width: 90%; max-width: 900px; height: 80vh;
+            background: linear-gradient(135deg, #1a0a1a, #0a1a2e);
+            border: 2px solid #ff2d95; border-radius: 8px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 40px; gap: 40px; box-shadow: 0 0 50px rgba(255, 45, 149, 0.5);
+            position: relative; overflow: hidden;
+        }
+        
+        .slide-art {
+            width: 35%; height: 100%; display: flex; align-items: center;
+            justify-content: center; font-size: 200px; text-shadow: 0 0 20px rgba(255, 45, 149, 0.8);
+        }
+        
+        .slide-text {
+            width: 65%; height: 100%; display: flex; flex-direction: column;
+            justify-content: center; gap: 20px;
+        }
+        
+        .slide-text h2 { font-size: 36px; margin: 0; color: #ffdd57; text-shadow: 0 0 10px #ff9600; }
+        .slide-text p { font-size: 18px; line-height: 1.6; margin: 0; color: #fff; }
+        .slide-text .action { font-size: 24px; font-weight: bold; color: #ff2d95; animation: pulse 0.8s infinite; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        .slide-nav {
+            position: absolute; bottom: 20px; right: 20px;
+            display: flex; gap: 10px;
+        }
+        
+        .slide-btn {
+            background: #ff2d95; color: #fff; border: none;
+            padding: 10px 20px; border-radius: 4px; cursor: pointer;
+            font-weight: bold; font-size: 12px;
+        }
+        
+        .slide-btn:hover { background: #ff1080; }
+        .slide-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .slide-counter { position: absolute; top: 20px; right: 20px; font-size: 14px; color: #aaa; }
+        
+        .muted { opacity: 0.7; }
+        .small { font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <h1>💔 LOVE HURTS 💔 — Saturday 2/13/26 • Exit Bar 9PM–2AM</h1>
+        <div class="ui">
+            <div class="panel">❤️ Lives: <span id="lives">3</span></div>
+            <div class="panel">⚔️ Wave: <span id="level">1</span></div>
+            <div class="panel">✨ Combo: <span id="combo">0</span></div>
+            <div class="panel">⭐ Score: <span id="score">0</span></div>
+            <div class="panel">🔥 Multiplier: <span id="mult">1x</span></div>
+        </div>
+        <canvas id="game" width="800" height="500"></canvas>
+        <div class="controls">
+            ⬅️➡️ or A/D to Move • SPACE to Shoot • Build COMBOS • Dodge the Chaos 🎯<br/>
+            <span class="muted">Impress the DJ and win the heart 💕</span>
+        </div>
+    </div>
+
+    <div id="cutsceneContainer">
+        <div class="slide-counter"><span id="slideNum">1</span> / <span id="slideTotal">1</span></div>
+        <div class="cutscene-slide" id="cutsceneSlide">
+            <div class="slide-art" id="slideArt">🎧</div>
+            <div class="slide-text">
+                <h2 id="slideTitle">Story</h2>
+                <p id="slideDesc">Loading...</p>
+                <div class="action" id="slideAction"></div>
             </div>
-            <canvas id="game" width="800" height="600"></canvas>
-            <div style="width:800px;max-width:92%;display:flex;justify-content:space-between;margin-top:10px">
-                <div class="muted small">Controls: Arrow keys / A-D to move, Space to shoot, Click overlays to continue</div>
-                <div class="muted small">Made with ❤️ — See you Saturday?</div>
-            </div>
-        <!doctype html>
-        <html>
-          <head>
-            <meta charset="utf-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1" />
-            <title>Love Hurts — Saturday 2/13/26</title>
-            <style>
-              html,body{height:100%;margin:0;background:#111;color:#fff;font-family:Inter,Arial}
-              .wrap{display:flex;flex-direction:column;align-items:center;padding:16px}
-              canvas{background:linear-gradient(#111, #1a1a1a);box-shadow:0 8px 30px rgba(0,0,0,.7);border-radius:8px}
-              .ui{width:800px;display:flex;justify-content:space-between;align-items:center;margin:12px 0}
-              .panel{background:#0b0b0b;padding:8px 12px;border-radius:8px;border:2px solid #2b2b2b}
-              .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.75);z-index:20}
-              .cutscene{width:840px;max-width:92%;background:#fff;color:#000;padding:18px;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.6);display:grid;grid-template-columns:160px 1fr;gap:12px}
-              .cutscene img{width:150px;height:150px;object-fit:cover;border-radius:8px}
-              .cutscene .text{font-size:18px;line-height:1.3}
-              .btn{background:#ff2d95;color:#fff;padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
-              .brand{font-weight:700;color:#ffdd57}
-              .muted{opacity:.8}
-              .small{font-size:13px}
-              .typewriter{font-family:Georgia,serif;font-size:20px}
-            </style>
-          </head>
-          <body>
-            <div class="wrap">
-              <h1>Love Hurts — Saturday 2/13/26 <span class="small muted">Exit Bar • 9PM–2AM</span></h1>
-              <div class="ui">
-                <div class="panel">Lives: <span id="lives">3</span></div>
-                <div class="panel">Level: <span id="level">1</span></div>
-                <div class="panel">Power: <span id="power">Normal</span></div>
-                <div class="panel">Score: <span id="score">0</span></div>
-              </div>
-              <canvas id="game" width="800" height="600"></canvas>
-              <div style="width:800px;max-width:92%;display:flex;justify-content:space-between;margin-top:10px">
-                <div class="muted small">Controls: Arrow keys / A-D to move, Space to shoot, Click overlays to continue</div>
-                <div class="muted small">Made with ❤️ — See you Saturday?</div>
-              </div>
-            </div>
+        </div>
+        <div class="slide-nav">
+            <button class="slide-btn" id="prevBtn" onclick="prevSlide()">← Back</button>
+            <button class="slide-btn" id="nextBtn" onclick="nextSlide()">Next →</button>
+        </div>
+    </div>
 
-            <div id="overlay" class="overlay" style="display:none"></div>
+    <script>
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width, H = canvas.height;
 
-            <script>
-            // Assets (use supplied imgur links)
-            const ASSET_FLYER = 'https://i.imgur.com/pwIpd8E.png';
-            const ASSET_AVATAR = 'https://i.imgur.com/y8tV91O.png';
+        // === GAME STATE ===
+        let lives = 3, level = 1, score = 0, combo = 0, multiplier = 1;
+        let gameActive = false, gamePaused = false;
+        let particles = [], explosions = [];
 
-            const canvas = document.getElementById('game');
-            const ctx = canvas.getContext('2d');
-            const W = canvas.width, H = canvas.height;
+        // === PLAYER ===
+        const player = { x: W/2, y: H - 50, w: 40, h: 40, spd: 6, health: 100 };
 
-            // Game state
-            let lives = 3, level = 1, score = 0;
-            let powerState = 'Normal';
+        // === ENTITIES ===
+        let bullets = [], enemies = [], powerups = [];
+        let screenShake = 0, hitFlash = 0;
+
+        // === CONTROLS ===
+        const keys = {};
+        window.addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; });
+        window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+
+        // === UTILITIES ===
+        const rand = (min, max) => Math.random() * (max - min) + min;
+        const rectsCollide = (a, b) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+        const dist = (x1, y1, x2, y2) => Math.sqrt((x2-x1)**2 + (y2-y1)**2);
+
+        // === PARTICLE SYSTEM ===
+        function createParticle(x, y, color, vx, vy) {
+            particles.push({ x, y, vx, vy, life: 30, color, size: 4 });
+        }
+
+        function createExplosion(x, y, color, count = 8) {
+            for (let i = 0; i < count; i++) {
+                const angle = (i / count) * Math.PI * 2;
+                const v = 3 + Math.random() * 2;
+                createParticle(x, y, color, Math.cos(angle) * v, Math.sin(angle) * v);
+            }
+            explosions.push({ x, y, radius: 0, maxRadius: 40, life: 20, color });
+        }
+
+        // === ENEMY SYSTEM ===
+        function spawnBaddies() {
+            const baseCount = 4 + level * 2;
+            for (let i = 0; i < baseCount; i++) {
+                const x = rand(40, W - 40);
+                const y = rand(-400, -50);
+                const type = level < 3 ? 'basic' : level < 5 ? 'split' : 'boss';
+                enemies.push({
+                    x, y, w: 28, h: 28, hp: type === 'basic' ? 1 : type === 'split' ? 2 : 5,
+                    spd: 1.5 + level * 0.3, type, angle: 0, shootCool: 0
+                });
+            }
+        }
+
+        // === CUTSCENE SYSTEM ===
+        const cutscenes = {
+            1: [
+                { art: '🎧', title: 'The DJ', desc: 'Spinning beats at Exit Bar...', action: 'I need to catch their eye!' },
+                { art: '💔', title: 'The Challenge', desc: 'But the dance floor is CHAOS...', action: 'Dodge & Impress!' },
+            ],
+            2: [
+                { art: '⚡', title: 'They Notice!', desc: 'The DJ looked in your direction!', action: 'Stay focused...' },
+                { art: '🎶', title: 'Tempo Rising', desc: 'The beat gets HARDER...', action: 'More enemies incoming!' },
+            ],
+            3: [
+                { art: '😍', title: 'Eye Contact!', desc: 'You locked eyes across the dance floor!', action: 'Almost there!' },
+                { art: '🔥', title: 'Peak Hour', desc: 'The crowd is WILD...', action: 'Chaos everywhere!' },
+            ],
+            4: [
+                { art: '💫', title: 'Moment of Truth', desc: 'The finals minutes before midnight...', action: 'Give it everything!' },
+                { art: '⭐', title: 'Last Stand', desc: 'One final wave of obstacles...', action: 'ALL IN!' },
+            ],
+            5: [
+                { art: '👑', title: 'VICTORY!', desc: 'You won their heart on the dance floor!', action: 'Saturday 2/13 🎉' },
+                { art: '💕', title: 'Exit Bar Ready', desc: 'See you this Saturday at 9PM!', action: '9PM–2AM • Get Down!' },
+            ]
+        };
+
+        let currentSlide = 0;
+        let currentCutscene = 1;
+
+        function showCutscene(n) {
+            if (!cutscenes[n]) return;
+            currentCutscene = n;
+            currentSlide = 0;
+            displaySlide();
+            document.getElementById('cutsceneContainer').classList.add('active');
+            gameActive = false;
+        }
+
+        function displaySlide() {
+            const scene = cutscenes[currentCutscene] || [];
+            const slide = scene[currentSlide];
+            if (!slide) return;
+
+            document.getElementById('slideArt').textContent = slide.art;
+            document.getElementById('slideTitle').textContent = slide.title;
+            document.getElementById('slideDesc').textContent = slide.desc;
+            document.getElementById('slideAction').textContent = slide.action;
+            document.getElementById('slideNum').textContent = currentSlide + 1;
+            document.getElementById('slideTotal').textContent = scene.length;
+
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === scene.length - 1;
+        }
+
+        window.nextSlide = function() {
+            const scene = cutscenes[currentCutscene] || [];
+            if (currentSlide < scene.length - 1) {
+                currentSlide++;
+                displaySlide();
+            } else {
+                closeCutscene();
+            }
+        };
+
+        window.prevSlide = function() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                displaySlide();
+            }
+        };
+
+        function closeCutscene() {
+            document.getElementById('cutsceneContainer').classList.remove('active');
+            gameActive = true;
+        }
+
+        // === GAMEPLAY ===
+        function startLevel(n) {
+            level = n;
+            lives = Math.max(lives, 2);
+            combo = 0;
+            multiplier = 1;
+            score += level * 500;
+            updateUI();
+            
+            bullets = [];
+            enemies = [];
+            powerups = [];
+            screenShake = 0;
+            player.x = W / 2;
+            player.health = 100;
+
+            spawnBaddies();
+            showCutscene(n);
+        }
+
+        function updateUI() {
             document.getElementById('lives').textContent = lives;
             document.getElementById('level').textContent = level;
+            document.getElementById('combo').textContent = combo;
             document.getElementById('score').textContent = score;
-            document.getElementById('power').textContent = powerState;
+            document.getElementById('mult').textContent = multiplier + 'x';
+        }
 
-            // Player
-            const player = {x:W/2,y:H-60,w:48,h:48,spd:5,shootCooldown:0};
+        function shoot() {
+            const patterns = [
+                [{ dx: 0, dy: -1 }],
+                [{ dx: -0.3, dy: -1 }, { dx: 0, dy: -1 }, { dx: 0.3, dy: -1 }],
+                [{ dx: -0.5, dy: -1 }, { dx: -0.25, dy: -1 }, { dx: 0, dy: -1 }, { dx: 0.25, dy: -1 }, { dx: 0.5, dy: -1 }],
+            ];
+            
+            const pattern = patterns[Math.min(Math.floor(combo / 5), 2)];
+            pattern.forEach(p => {
+                bullets.push({
+                    x: player.x + p.dx * 10,
+                    y: player.y - 20,
+                    w: 6, h: 12,
+                    vx: p.dx * 2,
+                    vy: p.dy * 8,
+                    life: 300
+                });
+            });
+        }
 
-            // Entities
-            let bullets = [];
-            let obstacles = [];
-            let powerups = [];
+        // === MAIN LOOP ===
+        let lastTime = performance.now();
+        function gameLoop(t) {
+            const dt = Math.min((t - lastTime) / 16, 2);
+            lastTime = t;
 
-            // Visual flags
-            let screenShake = 0;
+            if (gameActive) {
+                // INPUT
+                if (keys['arrowleft'] || keys['a']) player.x = Math.max(20, player.x - player.spd);
+                if (keys['arrowright'] || keys['d']) player.x = Math.min(W - 20, player.x + player.spd);
+                if (keys[' ']) { shoot(); delete keys[' ']; }
 
-            // Controls
-            const keys = {};
-            window.addEventListener('keydown', e=>{keys[e.key.toLowerCase()]=true});
-            window.addEventListener('keyup', e=>{keys[e.key.toLowerCase()]=false});
-
-            // Utility
-            function rand(min,max){return Math.random()*(max-min)+min}
-            function hit(a,b){return a.x<a.x+b.w && a.x+a.w>b.x && a.y<a.y+b.h && a.y+a.h>b.y}
-            function rectsCollide(a,b){return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y}
-
-            // Spawn obstacles
-            function spawnWave(n){
-              for(let i=0;i<n;i++){
-                const size=32+Math.random()*24;
-                obstacles.push({x:rand(20,W-20-size),y:rand(-600,-40),w:size,h:size,spd:1+level*0.4+Math.random()*1.5,angle:Math.random()*Math.PI*2});
-              }
-            }
-
-            // Spawn powerup
-            function spawnPower(){
-              const t = Math.random();
-              const type = t<0.6? 'rapid':'big';
-              powerups.push({x:rand(40,W-40),y:rand(-400,-30),w:28,h:28,spd:1.5,type});
-            }
-
-            // Level management
-            function startLevel(n){
-              level=n;document.getElementById('level').textContent=level;
-              bullets=[];obstacles=[];powerups=[];player.x=W/2;player.shootCooldown=0;screenShake=0;
-              spawnWave(6 + n*3);
-              // spawn a powerup or two
-              if(Math.random()<0.8) spawnPower();
-              showCutsceneFor(level);
-            }
-
-            // Cutscenes data
-            const cutscenes = {
-              1: {title:'First Sight',text:'You spotting the DJ 🎧 — Me ignoring Friday, looking at Saturday',img:ASSET_AVATAR},
-              2: {title:'The Look',text:'DJ notices you — They looked at me?! (Surprised)',img:ASSET_AVATAR},
-              3: {title:'The Rival',text:"Can't get rejected if I shoot my shot... Evil hearts appear!",img:ASSET_FLYER},
-              4: {title:'The Chase',text:'Getting desperate... Saturday 2/13 is my only chance!',img:ASSET_FLYER},
-              5: {title:'Saturday Night',text:'YOU WON! See me Saturday 2/13 😘 — Exit Bar • 9PM–2AM',img:ASSET_FLYER}
-            };
-
-            const overlay = document.getElementById('overlay');
-
-            function showCutsceneFor(n){
-              const c = cutscenes[n];
-              overlay.innerHTML = '';
-              overlay.style.display='flex';
-              const box = document.createElement('div');
-              box.className='cutscene';
-              box.innerHTML = `<img src="${c.img}" alt="panel"><div><div style="font-weight:800;font-size:20px">${c.title}</div><div class="typewriter" style="margin-top:8px">${c.text}</div><div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center"><div class="small muted">Level ${n} / 5</div><button class="btn">Continue</button></div></div>`;
-              overlay.appendChild(box);
-              box.querySelector('button').addEventListener('click', ()=>{
-                overlay.style.display='none';
-                if(n===5) showWin();
-              });
-              overlay.addEventListener('click', e=>{ if(e.target===overlay) overlay.style.display='none' });
-            }
-
-            function showWin(){
-              overlay.innerHTML='';overlay.style.display='flex';
-              const box=document.createElement('div');box.className='cutscene';
-              box.innerHTML= `<img src="${ASSET_FLYER}"><div><div style="font-weight:900;font-size:24px">Saturday Night — Exit Bar</div><div style="margin-top:10px">You did it — DJ impressed! Bring friends. <span class="brand">Saturday 2/13/26 • 9PM–2AM</span></div><div style="margin-top:14px"><button class="btn">Play Again</button></div></div>`;
-              overlay.appendChild(box);
-              box.querySelector('button').addEventListener('click', ()=>{overlay.style.display='none';lives=3;score=0;document.getElementById('score').textContent=score;document.getElementById('lives').textContent=lives;startLevel(1);});
-            }
-
-            // Simple draw helpers
-            function drawPlayer(){
-              ctx.save();
-              ctx.fillStyle='#69f';
-              ctx.beginPath();ctx.arc(player.x,player.y,22,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.font='20px serif';ctx.fillText('😘',player.x-12,player.y+8);
-              ctx.restore();
-            }
-
-            function drawObstacle(o){
-              ctx.save();
-              ctx.translate(o.x+o.w/2,o.y+o.h/2);
-              ctx.rotate(Math.sin(o.angle + performance.now()/1000)/4);
-              ctx.fillStyle='#ff3b6b';
-              ctx.beginPath();
-              ctx.moveTo(-o.w/2,0);
-              ctx.quadraticCurveTo(-o.w/2,-o.h/2,0,-o.h/2);
-              ctx.quadraticCurveTo(o.w/2,-o.h/2,o.w/2,0);
-              ctx.quadraticCurveTo(o.w/2,o.h/2,0,o.h/2);
-              ctx.quadraticCurveTo(-o.w/2,o.h/2,-o.w/2,0);
-              ctx.fill();
-              ctx.fillStyle='#fff';ctx.font='18px serif';ctx.fillText('💔',-12,8);
-              ctx.restore();
-            }
-
-            function drawPower(p){
-              ctx.save();ctx.fillStyle = p.type==='rapid'?'#c56cff':'#ffd966';ctx.beginPath();ctx.arc(p.x,p.y,p.w/2,0,Math.PI*2);ctx.fill();ctx.fillStyle='#000';ctx.font='18px serif';ctx.fillText(p.type==='rapid'?'⚡':'⭐',p.x-10,p.y+6);ctx.restore();
-            }
-
-            // Game loop
-            let last = performance.now();
-            function loop(t){
-              const dt=(t-last)/16;last=t;
-              // update
-              if(overlay.style.display!=='flex' || overlay.childElementCount===0){
-                if(keys['arrowleft']||keys['a']) player.x -= player.spd*dt;
-                if(keys['arrowright']||keys['d']) player.x += player.spd*dt;
-                if(keys[' ']||keys['space']||keys['k']){
-                  if(player.shootCooldown<=0){
-                    shoot();
-                    player.shootCooldown = powerState==='Rapid' ? 6 : 14;
-                  }
+                // UPDATE BULLETS
+                for (let i = bullets.length - 1; i >= 0; i--) {
+                    const b = bullets[i];
+                    b.x += b.vx * dt;
+                    b.y += b.vy * dt;
+                    b.life--;
+                    if (b.life <= 0 || b.y < -20) bullets.splice(i, 1);
                 }
-                player.shootCooldown = Math.max(0, player.shootCooldown-1);
 
-                // bullets
-                bullets.forEach(b=>b.y-=b.spd*dt);
-                bullets = bullets.filter(b=>b.y> -20);
+                // UPDATE ENEMIES
+                enemies.forEach(e => {
+                    e.y += e.spd * dt;
+                    e.angle += 0.05 * dt;
+                    e.shootCool--;
+                });
+                enemies = enemies.filter(e => e.y < H + 50);
 
-                // obstacles
-                obstacles.forEach(o=>{ o.y += o.spd*dt; o.angle += 0.02*dt; });
-                obstacles = obstacles.filter(o=>o.y < H+100);
+                // COLLISION: BULLETS vs ENEMIES
+                for (let i = bullets.length - 1; i >= 0; i--) {
+                    for (let j = enemies.length - 1; j >= 0; j--) {
+                        if (rectsCollide(bullets[i], enemies[j])) {
+                            enemies[j].hp--;
+                            score += 10 * multiplier;
+                            combo++;
+                            multiplier = 1 + Math.floor(combo / 10);
+                            createExplosion(enemies[j].x, enemies[j].y, '#ff69b4', 6);
+                            createParticle(bullets[i].x, bullets[i].y, '#ffbb00', 0, 0);
 
-                // powerups
-                powerups.forEach(p=>p.y += p.spd*dt);
-                powerups = powerups.filter(p=>p.y < H+50);
+                            if (enemies[j].hp <= 0) {
+                                if (enemies[j].type === 'split') {
+                                    enemies.push({ ...enemies[j], x: enemies[j].x - 15, hp: 1 });
+                                    enemies.push({ ...enemies[j], x: enemies[j].x + 15, hp: 1 });
+                                }
+                                score += 50 * multiplier;
+                                enemies.splice(j, 1);
+                            }
 
-                // collisions bullets vs obstacles
-                for(let i=bullets.length-1;i>=0;i--){
-                  for(let j=obstacles.length-1;j>=0;j--){
-                    if(rectsCollide(bullets[i],obstacles[j])){
-                      score += 10 + level*2;document.getElementById('score').textContent = score;
-                      obstacles.splice(j,1);
-                      bullets.splice(i,1);
-                      screenShake = 8;
-                      break;
+                            bullets.splice(i, 1);
+                            screenShake = 4;
+                            break;
+                        }
                     }
-                  }
                 }
 
-                // player vs obstacles
-                const playerBox = {x:player.x-22,y:player.y-22,w:44,h:44};
-                for(let i=obstacles.length-1;i>=0;i--){
-                  const o = obstacles[i];
-                  if(rectsCollide(playerBox,o)){
-                    obstacles.splice(i,1);
-                    lives--;document.getElementById('lives').textContent = lives;
-                    screenShake = 12;
-                    if(lives<=0){gameOver();return}
-                  }
+                // COLLISION: PLAYER vs ENEMIES
+                const pBox = { x: player.x - 20, y: player.y - 20, w: 40, h: 40 };
+                for (let i = enemies.length - 1; i >= 0; i--) {
+                    if (rectsCollide(pBox, enemies[i])) {
+                        lives--;
+                        enemies.splice(i, 1);
+                        combo = 0;
+                        multiplier = 1;
+                        hitFlash = 10;
+                        screenShake = 8;
+                        createExplosion(player.x, player.y, '#ff1080', 12);
+                        if (lives <= 0) {
+                            gameActive = false;
+                            showGameOver();
+                        }
+                    }
                 }
 
-                // player vs powerups
-                for(let i=powerups.length-1;i>=0;i--){
-                  if(rectsCollide(playerBox,powerups[i])){
-                    const p = powerups[i];
-                    if(p.type==='rapid'){powerState='Rapid';document.getElementById('power').textContent=powerState; setTimeout(()=>{powerState='Normal';document.getElementById('power').textContent=powerState;},7000)}
-                    else {powerState='Big';document.getElementById('power').textContent=powerState; setTimeout(()=>{powerState='Normal';document.getElementById('power').textContent=powerState;},7000)}
-                    powerups.splice(i,1);
-                  }
+                // PARTICLES
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.life--;
+                    if (p.life <= 0) particles.splice(i, 1);
                 }
 
-                // level clear if few obstacles
-                if(obstacles.length===0){
-                  if(level<5){ startLevel(level+1);} else { showCutsceneFor(5); }
+                // LEVEL CLEAR
+                if (enemies.length === 0 && level < 5) {
+                    startLevel(level + 1);
+                } else if (enemies.length === 0 && level === 5) {
+                    gameActive = false;
+                    showCutscene(5);
                 }
-              }
-
-              // draw
-              ctx.clearRect(0,0,W,H);
-              ctx.save();
-              if(screenShake>0){ ctx.translate(rand(-screenShake,screenShake), rand(-screenShake,screenShake)); screenShake*=0.88; if(screenShake<0.5) screenShake=0; }
-              // background grid
-              ctx.fillStyle='rgba(255,255,255,0.03)';
-              for(let i=0;i<20;i++){ctx.fillRect(i*40,0,1,H)}
-              for(let j=0;j<15;j++){ctx.fillRect(0,j*40,W,1)}
-
-              // draw bullets
-              ctx.fillStyle='#fff';
-              bullets.forEach(b=>{ctx.beginPath();ctx.fillRect(b.x,b.y,b.w,b.h)});
-
-              // draw obstacles
-              obstacles.forEach(drawObstacle);
-
-              // draw powerups
-              powerups.forEach(drawPower);
-
-              drawPlayer();
-              ctx.restore();
-
-              // HUD
-              ctx.fillStyle='#fff'; ctx.font='14px monospace'; ctx.fillText('Saturday 2/13/26 • Exit Bar • 9PM–2AM',8,H-8);
-
-              requestAnimationFrame(loop);
             }
 
-            function shoot(){
-              if(powerState==='Big'){
-                bullets.push({x:player.x-6,y:player.y-40,w:12,h:30,spd:12}); bullets.push({x:player.x-26,y:player.y-40,w:12,h:30,spd:10}); bullets.push({x:player.x+14,y:player.y-40,w:12,h:30,spd:10});
-              } else {
-                bullets.push({x:player.x-4,y:player.y-40,w:8,h:18,spd:12});
-              }
+            updateUI();
+            draw(dt);
+            requestAnimationFrame(gameLoop);
+        }
+
+        function draw(dt) {
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, W, H);
+
+            // BACKGROUND EFFECT
+            ctx.strokeStyle = 'rgba(255, 45, 149, 0.1)';
+            ctx.lineWidth = 0.5;
+            for (let i = 0; i < 10; i++) {
+                ctx.beginPath();
+                ctx.arc(W / 2, H / 2, 20 + i * 15, 0, Math.PI * 2);
+                ctx.stroke();
             }
 
-            function gameOver(){
-              overlay.innerHTML='';overlay.style.display='flex';
-              const box=document.createElement('div');box.className='cutscene';
-              box.innerHTML=`<img src='${ASSET_AVATAR}'><div><div style='font-weight:900;font-size:22px'>Game Over</div><div style='margin-top:8px'>Hearts got you — Try again, charm the DJ! <span class='muted small'>Saturday 2/13/26</span></div><div style='margin-top:12px'><button class='btn'>Play Again</button></div></div>`;
-              overlay.appendChild(box);
-              box.querySelector('button').addEventListener('click', ()=>{overlay.style.display='none';lives=3;document.getElementById('lives').textContent=lives;startLevel(1);});
+            ctx.save();
+            if (screenShake > 0) {
+                ctx.translate(rand(-screenShake, screenShake), rand(-screenShake, screenShake));
+                screenShake *= 0.85;
             }
 
-            // start
-            startLevel(1);
-            requestAnimationFrame(loop);
+            // DRAW BULLETS
+            ctx.fillStyle = '#ffdd57';
+            bullets.forEach(b => {
+                ctx.fillRect(b.x - b.w / 2, b.y, b.w, b.h);
+                ctx.fillStyle = '#ffaa00';
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#ffdd57';
+            });
 
-            // spawn extras periodically
-            setInterval(()=>{ if(Math.random()<0.7) spawnPower(); if(Math.random()<0.9) obstacles.push({x:rand(20,W-60),y:-40,w:30+Math.random()*36,h:30+Math.random()*36,spd:1+level*0.5,angle:0}); },4000);
+            // DRAW ENEMIES
+            enemies.forEach(e => {
+                ctx.save();
+                ctx.translate(e.x + e.w / 2, e.y + e.h / 2);
+                ctx.rotate(e.angle);
+                
+                if (e.type === 'boss') {
+                    ctx.fillStyle = '#ff1080';
+                    ctx.beginPath();
+                    for (let i = 0; i < 6; i++) {
+                        const angle = (i / 6) * Math.PI * 2;
+                        const x = Math.cos(angle) * 16;
+                        const y = Math.sin(angle) * 16;
+                        if (i === 0) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.font = 'bold 16px Arial';
+                    ctx.fillText('👑', -8, 6);
+                } else if (e.type === 'split') {
+                    ctx.fillStyle = '#ff69b4';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 12, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '12px Arial';
+                    ctx.fillText('💔', -6, 4);
+                } else {
+                    ctx.fillStyle = '#ff3b6b';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 10, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '10px Arial';
+                    ctx.fillText('❤', -3, 2);
+                }
+                ctx.restore();
+            });
 
-            </script>
-          </body>
-        </html>
-        <div id="score">SCORE: 0</div>
+            // DRAW PLAYER
+            ctx.save();
+            if (hitFlash > 0) {
+                ctx.globalAlpha = 0.5 + Math.sin(hitFlash) * 0.5;
+                hitFlash--;
+            }
+            ctx.fillStyle = '#69f';
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, 20, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.font = 'bold 24px Arial';
+            ctx.fillText('💘', player.x - 12, player.y + 9);
+            ctx.restore();
+
+            // DRAW PARTICLES
+            ctx.globalAlpha = 0.8;
+            particles.forEach(p => {
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.life / 30;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // DRAW EXPLOSIONS
+            explosions.forEach(e => {
+                ctx.strokeStyle = e.color;
+                ctx.globalAlpha = e.life / 20;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
+                ctx.stroke();
+                e.radius += e.maxRadius / e.life;
+            });
+            explosions = explosions.filter(e => e.life-- > 0);
+
+            ctx.globalAlpha = 1;
+            ctx.restore();
+
+            // HUD CORNER TEXT
+            ctx.fillStyle = '#aaa';
+            ctx.font = '10px monospace';
+            ctx.fillText('Saturday 2/13/26 • Exit Bar • 9PM', 8, H - 8);
+        }
+
+        function showGameOver() {
+            currentCutscene = 0;
+            currentSlide = 0;
+            document.getElementById('slideArt').textContent = '😭';
+            document.getElementById('slideTitle').textContent = 'Game Over!';
+            document.getElementById('slideDesc').textContent = `You scored ${score} points! The DJ will remember you... come back stronger!`;
+            document.getElementById('slideAction').textContent = '❌ Try Again';
+            document.getElementById('prevBtn').disabled = true;
+            document.getElementById('nextBtn').textContent = 'Play Again';
+            document.getElementById('nextBtn').disabled = false;
+            document.getElementById('slideNum').style.display = 'none';
+            document.getElementById('slideTotal').style.display = 'none';
+            document.getElementById('cutsceneContainer').classList.add('active');
+        }
+
+        // START GAME
+        startLevel(1);
+        requestAnimationFrame(gameLoop);
+    </script>
+</body>
+</html>
