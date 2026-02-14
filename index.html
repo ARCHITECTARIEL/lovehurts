@@ -1093,13 +1093,7 @@
       }
     }
 
-    document.addEventListener("gesturestart", (e) => e.preventDefault(), { passive: false });
-    document.addEventListener("gesturechange", (e) => e.preventDefault(), { passive: false });
-    document.addEventListener("gestureend", (e) => e.preventDefault(), { passive: false });
-    document.addEventListener("touchmove", (e) => {
-      if (e.scale !== 1) e.preventDefault();
-    }, { passive: false });
-    
+    // Allow pinch-zoom but prevent double-tap zoom
     let lastTouchEnd = 0;
     document.addEventListener('touchend', (e) => {
       const now = Date.now();
@@ -1107,7 +1101,14 @@
         e.preventDefault();
       }
       lastTouchEnd = now;
-    }, false);
+    }, { passive: false });
+    
+    // Prevent double tap zoom on buttons
+    document.addEventListener('touchstart', (e) => {
+      if (e.target.closest('.btn, .touchBtn, .shootPad, .cut-btn')) {
+        e.preventDefault();
+      }
+    }, { passive: false });
 
     function toggleMute() {
       const v = $("bgVideo");
@@ -1711,4 +1712,113 @@
       for (let i = enemies.length - 1; i >= 0; i--) {
         const e = enemies[i];
         
-        for (let j = bullets.length - 1; j >= 0;
+        // Check collision with player
+        const dx = e.x - player.x;
+        const dy = e.y - player.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        
+        if (dist < e.r + player.r) {
+          enemies.splice(i, 1);
+          lives--;
+          combo = 0;
+          multiplier = 1;
+          hitFlash = 20;
+          screenShake = 15;
+          vibrate([50, 30, 50]);
+          createExplosion(e.x, e.y, "#ff2d95", 15);
+          
+          if (lives <= 0) {
+            showGameOver();
+            return;
+          }
+          continue;
+        }
+        
+        // Check collision with bullets
+        for (let j = bullets.length - 1; j >= 0; j--) {
+          const b = bullets[j];
+          const bx = b.x;
+          const by = b.y;
+          const bdx = bx - e.x;
+          const bdy = by - e.y;
+          const bdist = Math.sqrt(bdx*bdx + bdy*bdy);
+          
+          if (bdist < e.r + 6) {
+            bullets.splice(j, 1);
+            e.hp--;
+            
+            if (e.hp <= 0) {
+              enemies.splice(i, 1);
+              const baseScore = e.type === "boss" ? 50 : e.type === "split" ? 20 : 10;
+              score += baseScore * multiplier;
+              combo++;
+              
+              if (combo > 0 && combo % 10 === 0) {
+                multiplier = Math.min(multiplier + 1, 5);
+                toast(`Combo ${combo}! ${multiplier}x Multiplier`);
+              }
+              
+              createExplosion(e.x, e.y, e.type === "boss" ? "#ffdd57" : "#ff2d95", e.type === "boss" ? 25 : 12);
+              maybeDropPickup(e.x, e.y);
+              vibrate(e.type === "boss" ? [30, 20, 30] : 10);
+            } else {
+              createParticle(e.x, e.y, "#fff", (Math.random()-0.5)*3, (Math.random()-0.5)*3, 15, 4);
+            }
+            break;
+          }
+        }
+        
+        // Remove if off screen
+        if (e.y > GAME_H + 50) {
+          enemies.splice(i, 1);
+          combo = 0;
+          multiplier = Math.max(1, multiplier - 0.5);
+        }
+      }
+      
+      // Update pickups
+      for (let i = pickups.length - 1; i >= 0; i--) {
+        const p = pickups[i];
+        p.y += p.vy * dt;
+        p.t += 0.1 * dt;
+        
+        const pdx = p.x - player.x;
+        const pdy = p.y - player.y;
+        const pdist = Math.sqrt(pdx*pdx + pdy*pdy);
+        
+        if (pdist < p.r + player.r + 10) {
+          pickups.splice(i, 1);
+          const bonuses = { flyer: 25, clue: 15, kiss: 30, glitch: 50 };
+          score += bonuses[p.kind] || 10;
+          createExplosion(p.x, p.y, "#ffdd57", 8);
+          toast(`+${bonuses[p.kind]} ${p.kind.toUpperCase()}`);
+          vibrate(20);
+          continue;
+        }
+        
+        if (p.y > GAME_H + 30) pickups.splice(i, 1);
+      }
+      
+      // Spawn new wave if empty
+      if (enemies.length === 0 && gameActive && !gamePaused) {
+        level++;
+        showCutscene(Math.min(level, 5));
+      }
+      
+      updateUI();
+    }
+
+    function loop(now) {
+      const dt = (now - last) / 16.67;
+      last = now;
+      
+      update(dt);
+      draw();
+      
+      requestAnimationFrame(loop);
+    }
+
+    // Start the game
+    last = performance.now();
+    requestAnimationFrame(loop);
+    startLevel(1);
