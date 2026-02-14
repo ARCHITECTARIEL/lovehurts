@@ -38,7 +38,7 @@
     }
 
     #rotateWarning {
-      display: none;
+      display: none !important;
       position: fixed;
       inset: 0;
       z-index: 1000;
@@ -48,12 +48,6 @@
       flex-direction: column;
       text-align: center;
       padding: 20px;
-    }
-
-    @media (orientation: portrait) and (max-width: 600px) {
-      #rotateWarning {
-        display: flex;
-      }
     }
 
     #bgVideo {
@@ -910,11 +904,7 @@
 </head>
 
 <body>
-  <div id="rotateWarning">
-    <div style="font-size: 48px; margin-bottom: 16px;">📱</div>
-    <h2 style="color: var(--pink); margin: 0 0 12px; font-size: 24px;">Rotate Device</h2>
-    <p style="margin: 0; opacity: 0.9; max-width: 280px;">For the best gaming experience, please rotate your device to landscape mode.</p>
-  </div>
+  <!-- Rotation lock removed - play in any orientation -->
 
   <video id="bgVideo" autoplay muted loop playsinline>
     <source src="https://i.imgur.com/XPnfBQn.mp4" type="video/mp4">
