@@ -929,7 +929,7 @@
       <div class="title">
         <h1>💔 LOVE HURTS 💔 <span class="hidden-mobile">— <span class="gold">Saturday 2/14/26</span> • <span class="pink">DTSP</span></span></h1>
         <div class="sub">
-          <span class="badge">🎧 Exit Bar @ The Mandarin Hyde</span>
+          <span class="badge">🍹 Exit Bar @ The Mandarin Hyde</span>
           <span class="badge">⏰ 9PM–2AM</span>
           <span class="badge hidden-mobile">🎮 It's all about the game</span>
         </div>
@@ -1043,7 +1043,7 @@
     const EVENT_TIME = "9PM–2AM";
     const EVENT_CITY = "DTSP";
     const EVENT_ADDR = "475 Central Ave Unit 302, St Petersburg, FL 33701";
-    const GAME_LINK = "https://shiny-chainsaw-v6xr65jj57xh6955-8000.app.github.dev/";
+    const GAME_LINK = window.location.href;
 
     const FLYER_CANVA_EMBED = "https://www.canva.com/design/DAHBChHGCjI/O_Z56ttD_h3b9AqWfAK6Rg/view?embed";
     const FLYER_CANVA_VIEW = "https://www.canva.com/design/DAHBChHGCjI/UIEPyWbXS4XCztqQWg7Sdw/view?utm_content=DAHBChHGCjI&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=hf87a7a6838";
@@ -1056,6 +1056,7 @@
     const ENEMY_AVATAR_URL = "https://i.imgur.com/cntbZL4.png";
     let enemyAvatar = new Image();
     let enemyAvatarLoaded = false;
+    enemyAvatar.crossOrigin = "anonymous";
     enemyAvatar.onload = () => { enemyAvatarLoaded = true; };
     enemyAvatar.src = ENEMY_AVATAR_URL;
     
@@ -1269,7 +1270,7 @@
     );
 
     function createParticle(x, y, color, vx, vy, life = 30, size = 3) {
-      particles.push({ x, y, vx, vy, life, color, size });
+      particles.push({ x, y, vx, vy, life, maxLife: life, color, size });
     }
     
     function createExplosion(x, y, color, count = 10) {
@@ -1387,8 +1388,8 @@
       const bg = CUT_BG[(currentSlide + currentCut) % CUT_BG.length];
       $("cutBg").style.backgroundImage = `url('${bg}')`;
 
+      if (cutTimer) clearTimeout(cutTimer);
       if (resetTimer) {
-        if (cutTimer) clearTimeout(cutTimer);
         const delay = isMobile ? 3500 : 2800;
         cutTimer = setTimeout(() => {
           if ($("cutsceneContainer").classList.contains("active")) {
@@ -1405,7 +1406,26 @@
     }
 
     window.nextSlide = function () {
-      if (currentCut === 0) return;
+      if (currentCut === 0) {
+        if (currentSlide === 0) {
+          currentSlide = 1;
+          $("slideArt").textContent = "💘";
+          $("slideTitle").textContent = "EXIT Bar @ The Mandarin Hyde";
+          $("slideDesc").textContent = `475 Central Ave Unit 302\nSt Petersburg, FL 33701\n\n9PM — 2AM\nSaturday 2/14/26\n\nShow this screen at the door.\nLove Hurts — but only if you don't show up.`;
+          $("slideAction").textContent = "Open Flyer →";
+          $("slideSticker").textContent = "Tonight";
+          $("slideNum").textContent = "2";
+          $("prevBtn").disabled = false;
+        } else {
+          $("cutsceneContainer").classList.remove("active");
+          openFlyer();
+          setTimeout(() => {
+            lives = 3; score = 0; combo = 0; level = 1;
+            startLevel(1);
+          }, 2000);
+        }
+        return;
+      }
       
       vibrate(20);
       const scene = cutscenes[currentCut] || [];
@@ -1429,7 +1449,19 @@
     }
 
     window.prevSlide = function () {
-      if (currentCut === 0) return;
+      if (currentCut === 0) {
+        if (currentSlide > 0) {
+          currentSlide--;
+          $("slideArt").textContent = "🍹";
+          $("slideTitle").textContent = "Game Over — But The Night Continues";
+          $("slideDesc").textContent = `Score: ${score}\n\nDon't let the game end here.\n\n${EVENT_DATE}\n${EVENT_VENUE}\n${EVENT_TIME}\n${EVENT_ADDR}\n\nThe real connection happens at EXIT Bar tonight.`;
+          $("slideAction").textContent = "Tap Next to Continue to EXIT Bar →";
+          $("slideSticker").textContent = "See You Tonight";
+          $("slideNum").textContent = "1";
+          $("prevBtn").disabled = true;
+        }
+        return;
+      }
       
       vibrate(20);
       if (currentSlide > 0) {
@@ -1509,26 +1541,6 @@
       $("nextBtn").disabled = false;
       $("cutBg").style.backgroundImage = `url('${CUT_BG[0]}')`;
 
-      window.nextSlide = function () {
-        if (currentSlide === 0) {
-          currentSlide = 1;
-          $("slideArt").textContent = "💘";
-          $("slideTitle").textContent = "EXIT Bar @ The Mandarin Hyde";
-          $("slideDesc").textContent = `475 Central Ave Unit 302\nSt Petersburg, FL 33701\n\n9PM — 2AM\nSaturday 2/14/26\n\nShow this screen at the door.\nLove Hurts — but only if you don't show up.`;
-          $("slideAction").textContent = "Open Flyer →";
-          $("slideSticker").textContent = "Tonight";
-          $("slideNum").textContent = "2";
-          $("prevBtn").disabled = false;
-        } else {
-          $("cutsceneContainer").classList.remove("active");
-          openFlyer();
-          setTimeout(() => {
-            lives = 3; score = 0; combo = 0; level = 1;
-            startLevel(1);
-          }, 2000);
-        }
-      };
-      
       vibrate([100, 50, 100]);
     }
 
@@ -1543,157 +1555,170 @@
       }
     });
 
-    function loop(t) {
-      if (gamePaused) {
-        last = t;
-        requestAnimationFrame(loop);
-        return;
+    function draw() {
+      ctx.fillStyle = "rgba(7, 7, 12, 0.3)";
+      ctx.fillRect(0, 0, GAME_W, GAME_H);
+
+      if (screenShake > 0) {
+        ctx.save();
+        const sx = (Math.random() - 0.5) * screenShake;
+        const sy = (Math.random() - 0.5) * screenShake;
+        ctx.translate(sx, sy);
       }
 
-      const dt = Math.min((t - last) / 16, 2);
-      last = t;
+      if (hitFlash > 0) {
+        ctx.fillStyle = `rgba(255, 16, 128, ${hitFlash / 20})`;
+        ctx.fillRect(0, 0, GAME_W, GAME_H);
+        hitFlash--;
+      }
 
-      if (gameActive) {
-        showPeriodicPromo();
+      bullets.forEach(b => {
+        ctx.fillStyle = "#ffdd57";
+        ctx.shadowColor = "#ffdd57";
+        ctx.shadowBlur = 10;
+        ctx.fillRect(b.x - b.w/2, b.y, b.w, b.h);
+        ctx.shadowBlur = 0;
+      });
+
+      enemies.forEach(e => {
+        ctx.save();
+        ctx.translate(e.x, e.y);
         
-        input.left = input.left || keys["arrowleft"] || keys["a"];
-        input.right = input.right || keys["arrowright"] || keys["d"];
-        const wantsShoot = input.shoot || keys[" "];
-
-        if (input.left) player.x -= player.spd * dt;
-        if (input.right) player.x += player.spd * dt;
-        player.x = clamp(player.x, 26, GAME_W - 26);
-
-        if (shootCooldown > 0) shootCooldown -= 1 * dt;
-        if (wantsShoot && shootCooldown <= 0) shoot();
-        keys[" "] = false;
-
-        for (let i = bullets.length - 1; i >= 0; i--) {
-          const b = bullets[i];
-          b.x += b.vx * dt;
-          b.y += b.vy * dt;
-          b.life -= 1 * dt;
-          if (b.life <= 0 || b.y < -30) bullets.splice(i, 1);
-        }
-
-        enemies.forEach(e => {
-          e.y += e.spd * dt;
-          e.ang += 0.04 * dt;
-          e.x += Math.sin(e.ang) * (0.55 + level * 0.08) * dt;
-        });
-        enemies = enemies.filter(e => e.y < GAME_H + 60);
-
-        pickups.forEach(p => {
-          p.y += p.vy * dt;
-          p.t += 0.06 * dt;
-          p.x += Math.sin(p.t) * 0.8 * dt;
-        });
-        pickups = pickups.filter(p => p.y < GAME_H + 40);
-
-        for (let i = bullets.length - 1; i >= 0; i--) {
-          for (let j = enemies.length - 1; j >= 0; j--) {
-            const e = enemies[j];
-            const b = bullets[i];
-            const hit = rectsCollide(
-              { x: b.x - b.w / 2, y: b.y, w: b.w, h: b.h },
-              { x: e.x - e.r, y: e.y - e.r, w: e.r * 2, h: e.r * 2 }
-            );
-            if (hit) {
-              e.hp--;
-              score += 12 * multiplier;
-              combo++;
-              multiplier = 1 + Math.floor(combo / 10);
-              
-              if (combo === 10 || combo === 25 || combo === 50) {
-                toast(`🔥 ${combo} Combo! EXIT Bar Tonight!`);
-                if (combo === 25 && Math.random() > 0.5) {
-                  setTimeout(() => showExitBarFlyer(), 1500);
-                }
-              }
-              createExplosion(e.x, e.y, "#ff69b4", 8);
-              createParticle(b.x, b.y, "#ffdd57", rand(-1, 1), rand(-1, 1), 18, 3);
-              screenShake = Math.min(10, screenShake + 2);
-              vibrate(isMobile ? 20 : 5);
-
-              if (e.hp <= 0) {
-                if (e.type === "split") {
-                  enemies.push({ ...e, x: e.x - 18, hp: 1, r: 10, type: "basic" });
-                  enemies.push({ ...e, x: e.x + 18, hp: 1, r: 10, type: "basic" });
-                }
-                score += 60 * multiplier;
-                maybeDropPickup(e.x, e.y);
-                enemies.splice(j, 1);
-              }
-              bullets.splice(i, 1);
-              break;
-            }
-          }
-        }
-
-        const pBox = { x: player.x - player.r, y: player.y - player.r, w: player.r * 2, h: player.r * 2 };
-        for (let i = enemies.length - 1; i >= 0; i--) {
-          const e = enemies[i];
-          const eBox = { x: e.x - e.r, y: e.y - e.r, w: e.r * 2, h: e.r * 2 };
-          if (rectsCollide(pBox, eBox)) {
-            lives--;
-            combo = 0; multiplier = 1;
-            hitFlash = 10;
-            screenShake = 12;
-            createExplosion(player.x, player.y, "#ff1080", 14);
-            enemies.splice(i, 1);
-            vibrate(isMobile ? [50, 100, 50] : 50);
-            
-            if (lives <= 0) { showGameOver(); }
-          }
-        }
-
-        for (let i = pickups.length - 1; i >= 0; i--) {
-          const p = pickups[i];
-          const pBox2 = { x: p.x - p.r, y: p.y - p.r, w: p.r * 2, h: p.r * 2 };
-          if (rectsCollide(pBox, pBox2)) {
-            vibrate([30, 30]);
-            if (p.kind === "flyer") { 
-              score += 180; 
-              openOverlay(
-                "🗓️ Save the Date",
-                "EXIT Bar @ The Mandarin Hyde",
-                `You found a flyer pickup!\n\n${EVENT_DATE}\n${EVENT_TIME}\n${EVENT_ADDR}\n\nLove Hurts — Saturday 2/14/26`,
-                "Bring your high score to the bar tonight!"
-              );
-            }
-            else if (p.kind === "clue") { 
-              score += 220; 
-              openOverlay(
-                "💡 Pro Tip",
-                "How to win at EXIT Bar",
-                "Step 1: Show up tonight 9PM-2AM\nStep 2: Bring your confidence\nStep 3: Let the game guide you\n\nThe Mandarin Hyde, DTSP",
-                "It's all about the game."
-              );
-            }
-            else if (p.kind === "kiss") { 
-              score += 160; 
-              lives = Math.min(5, lives + 1); 
-              toast("💋 +1 life | Exit Bar Tonight!");
-            }
-            else if (p.kind === "glitch") { 
-              score += 260; 
-              toast("✨ Glitch bonus — See you at EXIT Bar!");
-            }
-            pickups.splice(i, 1);
-          }
-        }
-
-        const maxParticles = isLowEnd ? 30 : 60;
-        if (particles.length > maxParticles) {
-          particles.splice(0, particles.length - maxParticles);
+        if (enemyAvatarLoaded && e.type === "boss") {
+          const size = e.r * 2.5;
+          ctx.drawImage(enemyAvatar, -size/2, -size/2, size, size);
+        } else {
+          ctx.fillStyle = e.type === "boss" ? "#ff2d95" : e.type === "split" ? "#ff69b4" : "#ff1080";
+          ctx.beginPath();
+          ctx.arc(0, 0, e.r, 0, Math.PI * 2);
+          ctx.fill();
+          
+          ctx.strokeStyle = "#fff";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(0, 0, e.r + 3, 0, Math.PI * 2);
+          ctx.stroke();
         }
         
-        for (let i = particles.length - 1; i >= 0; i--) {
-          const p = particles[i];
-          p.x += p.vx * dt;
-          p.y += p.vy * dt;
-          p.life -= 1 * dt;
-          if (p.life <= 0) particles.splice(i, 1);
+        if (e.hp > 1) {
+          ctx.fillStyle = "#fff";
+          ctx.font = "10px sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText(e.hp, 0, -e.r - 5);
         }
+        
+        ctx.restore();
+      });
 
-        for
+      pickups.forEach(p => {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        const scale = 1 + Math.sin(p.t) * 0.1;
+        ctx.scale(scale, scale);
+        
+        const colors = { flyer: "#ffdd57", clue: "#69c9ff", kiss: "#ff69b4", glitch: "#b3ff00" };
+        ctx.fillStyle = colors[p.kind] || "#fff";
+        ctx.beginPath();
+        ctx.arc(0, 0, p.r, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.fillStyle = "#000";
+        ctx.font = "14px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        const icons = { flyer: "🗞️", clue: "💡", kiss: "💋", glitch: "✨" };
+        ctx.fillText(icons[p.kind] || "?", 0, 0);
+        
+        ctx.restore();
+      });
+
+      explosions.forEach((ex, i) => {
+        ctx.strokeStyle = ex.color;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(ex.x, ex.y, ex.r, 0, Math.PI * 2);
+        ctx.stroke();
+        ex.r += 2;
+        ex.life--;
+        if (ex.life <= 0) explosions.splice(i, 1);
+      });
+
+      particles.forEach((p, i) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life--;
+        
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.life / p.maxLife;
+        ctx.fillRect(p.x - p.size/2, p.y - p.size/2, p.size, p.size);
+        ctx.globalAlpha = 1;
+        if (p.life <= 0) particles.splice(i, 1);
+      });
+
+      ctx.save();
+      ctx.translate(player.x, player.y);
+      
+      ctx.fillStyle = "#ff2d95";
+      ctx.shadowColor = "#ff2d95";
+      ctx.shadowBlur = 20;
+      ctx.beginPath();
+      ctx.moveTo(0, -20);
+      ctx.lineTo(-15, 15);
+      ctx.lineTo(0, 10);
+      ctx.lineTo(15, 15);
+      ctx.closePath();
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      
+      ctx.fillStyle = "#fff";
+      ctx.beginPath();
+      ctx.arc(0, -5, 5, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.restore();
+
+      if (screenShake > 0) {
+        ctx.restore();
+        screenShake *= 0.9;
+        if (screenShake < 0.5) screenShake = 0;
+      }
+    }
+
+    function update(dt) {
+      if (!gameActive || gamePaused) return;
+      
+      showPeriodicPromo();
+      
+      input.left = input.left || keys["arrowleft"] || keys["a"];
+      input.right = input.right || keys["arrowright"] || keys["d"];
+      const wantsShoot = input.shoot || keys[" "];
+
+      if (input.left) player.x -= player.spd * dt;
+      if (input.right) player.x += player.spd * dt;
+      player.x = clamp(player.x, 26, GAME_W - 26);
+
+      if (shootCooldown > 0) shootCooldown -= 1 * dt;
+      if (wantsShoot && shootCooldown <= 0) shoot();
+      keys[" "] = false;
+
+      for (let i = bullets.length - 1; i >= 0; i--) {
+        const b = bullets[i];
+        b.x += b.vx * dt;
+        b.y += b.vy * dt;
+        b.life -= 1 * dt;
+        if (b.life <= 0 || b.y < -30) bullets.splice(i, 1);
+      }
+
+      enemies.forEach(e => {
+        e.y += e.spd * dt;
+        e.ang += 0.04 * dt;
+        e.x += Math.sin(e.ang) * (0.55 + level * 0.08) * dt;
+        
+        if (e.x < 30) e.x = 30;
+        if (e.x > GAME_W - 30) e.x = GAME_W - 30;
+      });
+
+      for (let i = enemies.length - 1; i >= 0; i--) {
+        const e = enemies[i];
+        
+        for (let j = bullets.length - 1; j >= 0;
