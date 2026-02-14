@@ -1,566 +1,1699 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Love Hurts — Saturday 2/13/26</title>
-    <style>
-        html, body {
-            height: 100%; margin: 0; background: linear-gradient(135deg, #0a0a1a 0%, #2a0a1a 50%, #1a0a1a 100%); 
-            color: #fff; font-family: 'Arial', sans-serif; overflow: hidden;
-        }
-        .wrap {
-            display: flex; flex-direction: column; align-items: center;
-            padding: 12px; height: 100vh; position: relative; z-index: 2;
-        }
-        h1 { margin: 8px 0; font-size: 20px; }
-        .ui {
-            width: 800px; display: flex; justify-content: space-around;
-            align-items: center; margin: 8px 0; gap: 12px;
-        }
-        .panel {
-            background: rgba(255, 45, 149, 0.2); padding: 6px 12px;
-            border-radius: 6px; border: 1px solid #ff2d95; font-size: 12px;
-        }
-        canvas {
-            background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a0a 100%);
-            box-shadow: 0 0 40px rgba(255, 45, 149, 0.4), inset 0 0 20px rgba(0, 0, 0, 0.8);
-            border: 2px solid #ff2d95; border-radius: 4px;
-        }
-        .controls {
-            width: 800px; text-align: center; font-size: 11px; margin-top: 8px;
-            color: #aaa;
-        }
-        
-        /* Cutscene system */
-        #cutsceneContainer {
-            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.95);
-            display: none; z-index: 200; flex-direction: column;
-            align-items: center; justify-content: center;
-            animation: fadeIn 0.4s ease-out;
-        }
-        #cutsceneContainer.active { display: flex; }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .cutscene-slide {
-            width: 90%; max-width: 900px; height: 80vh;
-            background: linear-gradient(135deg, #1a0a1a, #0a1a2e);
-            border: 2px solid #ff2d95; border-radius: 8px;
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 40px; gap: 40px; box-shadow: 0 0 50px rgba(255, 45, 149, 0.5);
-            position: relative; overflow: hidden;
-        }
-        
-        .slide-art {
-            width: 35%; height: 100%; display: flex; align-items: center;
-            justify-content: center; font-size: 200px; text-shadow: 0 0 20px rgba(255, 45, 149, 0.8);
-        }
-        
-        .slide-text {
-            width: 65%; height: 100%; display: flex; flex-direction: column;
-            justify-content: center; gap: 20px;
-        }
-        
-        .slide-text h2 { font-size: 36px; margin: 0; color: #ffdd57; text-shadow: 0 0 10px #ff9600; }
-        .slide-text p { font-size: 18px; line-height: 1.6; margin: 0; color: #fff; }
-        .slide-text .action { font-size: 24px; font-weight: bold; color: #ff2d95; animation: pulse 0.8s infinite; }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
-        }
-        
-        .slide-nav {
-            position: absolute; bottom: 20px; right: 20px;
-            display: flex; gap: 10px;
-        }
-        
-        .slide-btn {
-            background: #ff2d95; color: #fff; border: none;
-            padding: 10px 20px; border-radius: 4px; cursor: pointer;
-            font-weight: bold; font-size: 12px;
-        }
-        
-        .slide-btn:hover { background: #ff1080; }
-        .slide-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        
-        .slide-counter { position: absolute; top: 20px; right: 20px; font-size: 14px; color: #aaa; }
-        
-        .muted { opacity: 0.7; }
-        .small { font-size: 12px; }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#0a0a1a" />
+  <title>Love Hurts — Saturday 2/14/26</title>
+  <style>
+    :root {
+      --pink: #ff2d95;
+      --pink2: #ff1080;
+      --gold: #ffdd57;
+      --ink: #0a0a1a;
+      --glass: rgba(10, 10, 26, 0.55);
+      --shadow: 0 0 50px rgba(255, 45, 149, 0.35);
+      --touch-min: 48px;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      background: radial-gradient(1200px 600px at 50% 10%, #2a0a1a 0%, #0a0a1a 55%, #05050c 100%);
+      color: #fff;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      overflow: hidden;
+      overscroll-behavior: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: none;
+      position: fixed;
+      width: 100%;
+      height: 100%;
+    }
+
+    #rotateWarning {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: #0a0a1a;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+      padding: 20px;
+    }
+
+    @media (orientation: portrait) and (max-width: 600px) {
+      #rotateWarning {
+        display: flex;
+      }
+    }
+
+    #bgVideo {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      filter: saturate(1.05) contrast(1.05) brightness(0.9);
+      transform: scale(1.02);
+    }
+
+    .trippy-layer {
+      position: fixed;
+      inset: -20%;
+      z-index: 1;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      opacity: 0.25;
+      filter: blur(0px) saturate(1.2);
+      animation: drift 18s linear infinite;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(255, 45, 149, 0.45), transparent 40%),
+        radial-gradient(circle at 70% 40%, rgba(255, 221, 87, 0.35), transparent 38%),
+        radial-gradient(circle at 40% 75%, rgba(105, 153, 255, 0.25), transparent 45%),
+        conic-gradient(from 90deg at 50% 50%,
+          rgba(255, 45, 149, 0.14),
+          rgba(255, 221, 87, 0.08),
+          rgba(105, 153, 255, 0.10),
+          rgba(255, 45, 149, 0.14));
+    }
+
+    .trippy-layer.two {
+      opacity: 0.18;
+      mix-blend-mode: color-dodge;
+      animation-duration: 26s;
+      transform: scale(1.1) rotate(10deg);
+      background:
+        repeating-radial-gradient(circle at 50% 50%,
+          rgba(255, 45, 149, 0.10) 0px,
+          rgba(255, 45, 149, 0.10) 8px,
+          rgba(255, 221, 87, 0.06) 16px,
+          rgba(10, 10, 26, 0.0) 28px);
+    }
+
+    .noise {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0.10;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");
+      background-size: 240px 240px;
+      animation: grain 6s steps(6) infinite;
+    }
+
+    @keyframes grain {
+      0% { transform: translate(0, 0) }
+      10% { transform: translate(-2%, 1%) }
+      20% { transform: translate(-3%, -1%) }
+      30% { transform: translate(2%, 2%) }
+      40% { transform: translate(1%, -2%) }
+      50% { transform: translate(-1%, 2%) }
+      60% { transform: translate(-2%, -2%) }
+      70% { transform: translate(3%, 1%) }
+      80% { transform: translate(2%, -1%) }
+      90% { transform: translate(-1%, 1%) }
+      100% { transform: translate(0, 0) }
+    }
+
+    @keyframes drift {
+      0% { transform: translate(-2%, -1%) rotate(0deg) scale(1.02); }
+      50% { transform: translate(2%, 1%) rotate(180deg) scale(1.05); }
+      100% { transform: translate(-2%, -1%) rotate(360deg) scale(1.02); }
+    }
+
+    #bgBlob {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 3;
+      opacity: 0.24;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      filter: saturate(1.1) contrast(1.05);
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 10;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px;
+      padding-top: max(8px, env(safe-area-inset-top));
+      padding-bottom: max(8px, env(safe-area-inset-bottom));
+      gap: 8px;
+      box-sizing: border-box;
+    }
+
+    .topbar {
+      width: 100%;
+      max-width: 980px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    @media (min-width: 768px) {
+      .topbar {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+      }
+    }
+
+    .title {
+      background: rgba(10, 10, 26, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: var(--shadow);
+      border-radius: 16px;
+      padding: 12px;
+      backdrop-filter: blur(10px);
+    }
+
+    .title h1 {
+      margin: 0;
+      font-size: clamp(14px, 4vw, 18px);
+      letter-spacing: 0.4px;
+      line-height: 1.3;
+    }
+
+    .title .sub {
+      margin-top: 6px;
+      font-size: 11px;
+      opacity: 0.85;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 45, 149, 0.35);
+      background: rgba(255, 45, 149, 0.10);
+      font-size: 11px;
+    }
+
+    .ctaRow {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+    }
+
+    @media (min-width: 768px) {
+      .ctaRow {
+        justify-content: flex-end;
+      }
+    }
+
+    .btn {
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(10, 10, 26, 0.45);
+      color: #fff;
+      padding: 12px 16px;
+      min-height: var(--touch-min);
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: .2px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(10px);
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+      user-select: none;
+      touch-action: manipulation;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(255, 45, 149, 0.45);
+      background: rgba(255, 45, 149, 0.10);
+    }
+
+    .btn.primary {
+      background: rgba(255, 45, 149, 0.18);
+      border-color: rgba(255, 45, 149, 0.55);
+    }
+
+    .btn.primary:hover {
+      background: rgba(255, 45, 149, 0.25);
+    }
+
+    .ui {
+      width: 100%;
+      max-width: 980px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    @media (min-width: 640px) {
+      .ui {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 8px;
+      }
+    }
+
+    .panel {
+      background: rgba(255, 45, 149, 0.12);
+      border: 1px solid rgba(255, 45, 149, 0.45);
+      border-radius: 12px;
+      padding: 8px;
+      font-size: 11px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      min-height: 44px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      text-align: center;
+    }
+
+    @media (min-width: 640px) {
+      .panel {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 8px 10px;
+        font-size: 12px;
+      }
+    }
+
+    .panel b { color: var(--gold); font-size: 13px; }
+    .panel .tiny { font-size: 9px; opacity: 0.75; }
+
+    .canvasWrap {
+      width: 100%;
+      max-width: 980px;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      min-height: 0;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      max-height: 55vh;
+      aspect-ratio: 980 / 560;
+      border-radius: 18px;
+      border: 2px solid rgba(255, 45, 149, 0.70);
+      box-shadow: 0 0 50px rgba(255, 45, 149, 0.30), inset 0 0 20px rgba(0, 0, 0, 0.8);
+      background: radial-gradient(ellipse at center, #151528 0%, #07070c 100%);
+      touch-action: none;
+      display: block;
+    }
+
+    @media (max-height: 600px) {
+      canvas {
+        max-height: 50vh;
+      }
+    }
+
+    .controls {
+      width: 100%;
+      max-width: 980px;
+      text-align: center;
+      font-size: 11px;
+      opacity: 0.88;
+      background: rgba(10, 10, 26, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 14px;
+      padding: 8px 10px;
+      backdrop-filter: blur(10px);
+      display: none;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .controls {
+        display: block;
+      }
+    }
+
+    .muted { opacity: .7; }
+    .gold { color: var(--gold); }
+    .pink { color: var(--pink); }
+
+    .touchControls {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: max(10px, env(safe-area-inset-bottom));
+      z-index: 200;
+      display: none;
+      padding: 12px;
+      pointer-events: none;
+    }
+
+    @media (pointer: coarse), (hover: none) {
+      .touchControls {
+        display: block;
+      }
+    }
+
+    .touchRow {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      pointer-events: none;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .touchPad {
+      pointer-events: auto;
+      width: 42vw;
+      max-width: 240px;
+      height: 80px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 45, 149, 0.45);
+      background: rgba(10, 10, 26, 0.65);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      overflow: hidden;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .touchBtn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 24px;
+      letter-spacing: .4px;
+      color: #fff;
+      border-right: 1px solid rgba(255, 255, 255, 0.10);
+      background: rgba(255, 45, 149, 0.08);
+      transition: background 0.1s;
+      min-height: var(--touch-min);
+    }
+
+    .touchBtn:last-child { border-right: 0; }
+
+    .touchBtn.active {
+      background: rgba(255, 45, 149, 0.35);
+      box-shadow: inset 0 0 20px rgba(255, 45, 149, 0.45);
+    }
+
+    .shootPad {
+      pointer-events: auto;
+      width: 42vw;
+      max-width: 240px;
+      height: 80px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 221, 87, 0.40);
+      background: rgba(10, 10, 26, 0.65);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      touch-action: none;
+      font-weight: 900;
+      font-size: 16px;
+      letter-spacing: 1px;
+      color: var(--gold);
+      transition: all 0.1s;
+    }
+
+    .shootPad.active {
+      background: rgba(255, 221, 87, 0.25);
+      box-shadow: inset 0 0 20px rgba(255, 221, 87, 0.35);
+      transform: scale(0.98);
+    }
+
+    #cutsceneContainer {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.92);
+      backdrop-filter: blur(10px);
+      animation: fadeIn .35s ease-out;
+      padding: 10px;
+    }
+
+    #cutsceneContainer.active { display: flex; }
+    @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+
+    .cutscene-shell {
+      width: 100%;
+      max-width: 1060px;
+      max-height: 90vh;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 45, 149, 0.5);
+      box-shadow: 0 25px 90px rgba(0, 0, 0, 0.55);
+      position: relative;
+      background:
+        radial-gradient(900px 500px at 20% 10%, rgba(255, 45, 149, 0.28), transparent 55%),
+        radial-gradient(700px 420px at 85% 25%, rgba(255, 221, 87, 0.18), transparent 50%),
+        linear-gradient(135deg, rgba(10, 10, 26, 0.90), rgba(8, 8, 14, 0.96));
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cutscene-bgimg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: .20;
+      filter: saturate(1.2) contrast(1.05);
+      mix-blend-mode: screen;
+      transform: scale(1.04);
+    }
+
+    .cutscene-kaleido {
+      position: absolute;
+      inset: -20%;
+      background:
+        conic-gradient(from 0deg at 50% 50%,
+          rgba(255, 45, 149, 0.20),
+          rgba(255, 221, 87, 0.14),
+          rgba(105, 153, 255, 0.14),
+          rgba(255, 45, 149, 0.20));
+      opacity: .25;
+      mix-blend-mode: color-dodge;
+      filter: blur(0.2px) saturate(1.3);
+      animation: spin 14s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg) scale(1.02); }
+      100% { transform: rotate(360deg) scale(1.02); }
+    }
+
+    .cutscene-content {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    @media (min-width: 768px) {
+      .cutscene-content {
+        display: grid;
+        grid-template-columns: 0.95fr 1.05fr;
+        gap: 18px;
+        padding: 22px;
+      }
+    }
+
+    .artCard {
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(10, 10, 26, 0.40);
+      backdrop-filter: blur(12px);
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 20px 55px rgba(0, 0, 0, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+      aspect-ratio: 1;
+    }
+
+    @media (min-width: 768px) {
+      .artCard {
+        min-height: 260px;
+        aspect-ratio: auto;
+      }
+    }
+
+    .artCard::before {
+      content: "";
+      position: absolute;
+      inset: -30%;
+      background:
+        radial-gradient(circle at 30% 20%, rgba(255, 45, 149, 0.45), transparent 45%),
+        radial-gradient(circle at 70% 70%, rgba(255, 221, 87, 0.30), transparent 40%),
+        radial-gradient(circle at 55% 45%, rgba(105, 153, 255, 0.22), transparent 48%);
+      opacity: .55;
+      mix-blend-mode: screen;
+      filter: blur(14px);
+      animation: drift 16s linear infinite;
+      pointer-events: none;
+    }
+
+    .artBig {
+      font-size: clamp(60px, 15vw, 170px);
+      text-shadow: 0 0 30px rgba(255, 45, 149, 0.85);
+      transform: rotate(-4deg);
+      filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.35));
+      user-select: none;
+      z-index: 2;
+    }
+
+    .sticker {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 45, 149, 0.55);
+      background: rgba(255, 45, 149, 0.14);
+      font-weight: 800;
+      font-size: 11px;
+      letter-spacing: .3px;
+      z-index: 3;
+    }
+
+    .textCard {
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(10, 10, 26, 0.45);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 20px 55px rgba(0, 0, 0, 0.35);
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cut-h {
+      margin: 0;
+      font-size: clamp(20px, 5vw, 34px);
+      color: var(--gold);
+      text-shadow: 0 0 14px rgba(255, 150, 0, 0.45);
+      letter-spacing: .2px;
+      line-height: 1.2;
+    }
+
+    .cut-p {
+      margin: 10px 0 0;
+      font-size: clamp(14px, 4vw, 18px);
+      line-height: 1.5;
+      opacity: 0.95;
+    }
+
+    .actionLine {
+      margin-top: 12px;
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+      font-weight: 900;
+      color: var(--pink);
+      font-size: clamp(13px, 3.5vw, 20px);
+      text-shadow: 0 0 18px rgba(255, 45, 149, 0.55);
+      animation: pulse .85s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: translateY(0); }
+      50% { opacity: .72; transform: translateY(-1px); }
+    }
+
+    .cut-meta {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      font-size: 11px;
+      opacity: .8;
+      z-index: 4;
+    }
+
+    .chip {
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(10px);
+    }
+
+    .cut-nav {
+      position: relative;
+      margin-top: 16px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: flex-end;
+      z-index: 5;
+    }
+
+    @media (min-width: 768px) {
+      .cut-nav {
+        position: absolute;
+        bottom: 14px;
+        right: 14px;
+        margin-top: 0;
+      }
+    }
+
+    .cut-btn {
+      border: 1px solid rgba(255, 45, 149, 0.50);
+      background: rgba(255, 45, 149, 0.14);
+      color: #fff;
+      padding: 12px 16px;
+      min-height: var(--touch-min);
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: .2px;
+      touch-action: manipulation;
+      flex: 1;
+    }
+
+    @media (min-width: 768px) {
+      .cut-btn {
+        flex: none;
+      }
+    }
+
+    .cut-btn:active {
+      transform: scale(0.96);
+      background: rgba(255, 45, 149, 0.30);
+    }
+
+    .cut-btn:hover { background: rgba(255, 45, 149, 0.22); }
+    .cut-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+    #overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 400;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(10px);
+      animation: fadeIn .25s ease-out;
+      padding: 10px;
+    }
+
+    #overlay.active { display: flex; }
+
+    .modal {
+      width: 100%;
+      max-width: 980px;
+      max-height: 90vh;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 45, 149, 0.55);
+      box-shadow: 0 25px 90px rgba(0, 0, 0, 0.60);
+      background:
+        radial-gradient(800px 420px at 20% 15%, rgba(255, 45, 149, 0.22), transparent 55%),
+        radial-gradient(650px 360px at 85% 30%, rgba(255, 221, 87, 0.14), transparent 52%),
+        rgba(10, 10, 26, 0.92);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modalHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+      background: rgba(0, 0, 0, 0.18);
+      gap: 10px;
+    }
+
+    .modalHeader .mhTitle {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-weight: 900;
+      letter-spacing: .2px;
+      font-size: 14px;
+    }
+
+    .closeX {
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(0, 0, 0, 0.25);
+      color: #fff;
+      border-radius: 12px;
+      padding: 8px 12px;
+      font-weight: 900;
+      touch-action: manipulation;
+      min-width: var(--touch-min);
+      min-height: var(--touch-min);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modalBody {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 12px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    @media (min-width: 768px) {
+      .modalBody {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 12px;
+      }
+    }
+
+    .flyerFrame {
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      background: rgba(0, 0, 0, 0.22);
+      overflow: hidden;
+      position: relative;
+      aspect-ratio: 4/3;
+      min-height: 300px;
+    }
+
+    @media (min-width: 768px) {
+      .flyerFrame {
+        aspect-ratio: auto;
+        min-height: 420px;
+      }
+    }
+
+    .flyerGlow {
+      position: absolute;
+      inset: -20%;
+      background:
+        conic-gradient(from 180deg,
+          rgba(255, 45, 149, 0.20),
+          rgba(255, 221, 87, 0.12),
+          rgba(105, 153, 255, 0.12),
+          rgba(255, 45, 149, 0.20));
+      opacity: .25;
+      mix-blend-mode: color-dodge;
+      animation: spin 12s linear infinite;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .promoCard {
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      background: rgba(0, 0, 0, 0.24);
+      padding: 14px;
+      backdrop-filter: blur(12px);
+    }
+
+    .promoCard h3 {
+      margin: 0;
+      font-size: 15px;
+      color: var(--gold);
+      text-shadow: 0 0 10px rgba(255, 150, 0, 0.35);
+    }
+
+    .promoCard p {
+      margin: 8px 0 0;
+      font-size: 13px;
+      line-height: 1.5;
+      opacity: .92;
+      white-space: pre-line;
+    }
+
+    .promoActions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .promoActions .btn {
+      flex: 1;
+      min-width: 120px;
+    }
+
+    .tinyNote {
+      margin-top: 10px;
+      font-size: 11px;
+      opacity: .75;
+    }
+
+    #toast {
+      position: fixed;
+      bottom: max(100px, calc(env(safe-area-inset-bottom) + 90px));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 500;
+      display: none;
+      padding: 12px 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 45, 149, 0.55);
+      background: rgba(10, 10, 26, 0.85);
+      box-shadow: 0 20px 55px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(12px);
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: .2px;
+      max-width: 90vw;
+      text-align: center;
+    }
+
+    #toast.show { display: block; animation: pop .18s ease-out; }
+    @keyframes pop {
+      from { transform: translateX(-50%) scale(.98); opacity: 0; }
+      to { transform: translateX(-50%) scale(1); opacity: 1; }
+    }
+
+    .hidden-mobile {
+      display: none;
+    }
+
+    @media (min-width: 768px) {
+      .hidden-mobile {
+        display: inline;
+      }
+    }
+  </style>
 </head>
+
 <body>
-    <video 
-        id="bgVideo"
-        autoplay 
-        muted 
-        loop 
-        playsinline
-        style="position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;">
-        <source src="https://i.imgur.com/XPnfBQn.mp4" type="video/mp4">
-    </video>
-    
-    <img 
-        id="bgBlob"
-        src="https://i.imgur.com/7ae31628-ac1d-496d-9f01-c3800f11cbe2.png"
-        style="position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; opacity: 0.3; pointer-events: none;"
-    />
-    
-    <div class="wrap">
-        <h1>💔 LOVE HURTS 💔 — Saturday 2/13/26 • Exit Bar 9PM–2AM</h1>
-        <div class="ui">
-            <div class="panel">❤️ Lives: <span id="lives">3</span></div>
-            <div class="panel">⚔️ Wave: <span id="level">1</span></div>
-            <div class="panel">✨ Combo: <span id="combo">0</span></div>
-            <div class="panel">⭐ Score: <span id="score">0</span></div>
-            <div class="panel">🔥 Multiplier: <span id="mult">1x</span></div>
+  <div id="rotateWarning">
+    <div style="font-size: 48px; margin-bottom: 16px;">📱</div>
+    <h2 style="color: var(--pink); margin: 0 0 12px; font-size: 24px;">Rotate Device</h2>
+    <p style="margin: 0; opacity: 0.9; max-width: 280px;">For the best gaming experience, please rotate your device to landscape mode.</p>
+  </div>
+
+  <video id="bgVideo" autoplay muted loop playsinline>
+    <source src="https://i.imgur.com/XPnfBQn.mp4" type="video/mp4">
+  </video>
+  <div class="trippy-layer"></div>
+  <div class="trippy-layer two"></div>
+  <div class="noise"></div>
+  <img id="bgBlob" src="https://i.imgur.com/7ae31628-ac1d-496d-9f01-c3800f11cbe2.png" alt="overlay" />
+
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title">
+        <h1>💔 LOVE HURTS 💔 <span class="hidden-mobile">— <span class="gold">Saturday 2/14/26</span> • <span class="pink">DTSP</span></span></h1>
+        <div class="sub">
+          <span class="badge">🎧 Exit Bar @ The Mandarin Hyde</span>
+          <span class="badge">⏰ 9PM–2AM</span>
+          <span class="badge hidden-mobile">🎮 It's all about the game</span>
         </div>
-        <canvas id="game" width="800" height="500"></canvas>
-        <div class="controls">
-            ⬅️➡️ or A/D to Move • SPACE to Shoot • Build COMBOS • Dodge the Chaos 🎯<br/>
-            <span class="muted">Impress the DJ and win the heart 💕</span>
-        </div>
+      </div>
+
+      <div class="ctaRow">
+        <button class="btn primary" onclick="openFlyer()">Show Flyer</button>
+        <button class="btn" onclick="openPromo('quick')">How to Play</button>
+        <button class="btn hidden-mobile" onclick="toggleMute()">Toggle Sound</button>
+      </div>
     </div>
 
-    <div id="cutsceneContainer">
-        <div class="slide-counter"><span id="slideNum">1</span> / <span id="slideTotal">1</span></div>
-        <div class="cutscene-slide" id="cutsceneSlide">
-            <div class="slide-art" id="slideArt">🎧</div>
-            <div class="slide-text">
-                <h2 id="slideTitle">Story</h2>
-                <p id="slideDesc">Loading...</p>
-                <div class="action" id="slideAction"></div>
-            </div>
-        </div>
-        <div class="slide-nav">
-            <button class="slide-btn" id="prevBtn" onclick="prevSlide()">← Back</button>
-            <button class="slide-btn" id="nextBtn" onclick="nextSlide()">Next →</button>
-        </div>
+    <div class="ui">
+      <div class="panel"><span>❤️ Lives</span> <b id="lives">3</b></div>
+      <div class="panel"><span>⚔️ Wave</span> <b id="level">1</b></div>
+      <div class="panel"><span>✨ Combo</span> <b id="combo">0</b></div>
+      <div class="panel"><span>⭐ Score</span> <b id="score">0</b></div>
+      <div class="panel"><span>🔥 Mult</span> <b id="mult">1x</b></div>
+      <div class="panel"><span>📱</span> <span class="tiny">Touch Controls</span></div>
     </div>
 
-    <script>
-        const canvas = document.getElementById('game');
-        const ctx = canvas.getContext('2d');
-        const W = canvas.width, H = canvas.height;
+    <div class="canvasWrap">
+      <canvas id="game"></canvas>
+    </div>
 
-        // === GAME STATE ===
-        let lives = 3, level = 1, score = 0, combo = 0, multiplier = 1;
-        let gameActive = false, gamePaused = false;
-        let particles = [], explosions = [];
+    <div class="controls">
+      Desktop: ⬅️➡️ / A,D move • SPACE shoot • Mobile: hold <span class="pink">◀ / ▶</span> to move, hold <span class="gold">SHOOT</span> to fire.
+      <div class="muted">Flirty chaos. Connection in the crowd. That's the whole point.</div>
+    </div>
+  </div>
 
-        // === PLAYER ===
-        const player = { x: W/2, y: H - 50, w: 40, h: 40, spd: 6, health: 100 };
+  <div class="touchControls" id="touchControls">
+    <div class="touchRow">
+      <div class="touchPad" id="movePad">
+        <div class="touchBtn" id="btnLeft" role="button" aria-label="Move Left">◀</div>
+        <div class="touchBtn" id="btnRight" role="button" aria-label="Move Right">▶</div>
+      </div>
+      <div class="shootPad" id="shootPad" role="button" aria-label="Shoot">
+        <div>FIRE</div>
+      </div>
+    </div>
+  </div>
 
-        // === ENTITIES ===
-        let bullets = [], enemies = [], powerups = [];
-        let screenShake = 0, hitFlash = 0;
+  <div id="cutsceneContainer">
+    <div class="cutscene-shell">
+      <div class="cutscene-bgimg" id="cutBg"></div>
+      <div class="cutscene-kaleido"></div>
 
-        // === CONTROLS ===
-        const keys = {};
-        window.addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; });
-        window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+      <div class="cut-meta">
+        <span class="chip">Slide <b id="slideNum">1</b>/<b id="slideTotal">1</b></span>
+        <span class="chip hidden-mobile">💘 Connection > Everything</span>
+      </div>
 
-        // === UTILITIES ===
-        const rand = (min, max) => Math.random() * (max - min) + min;
-        const rectsCollide = (a, b) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
-        const dist = (x1, y1, x2, y2) => Math.sqrt((x2-x1)**2 + (y2-y1)**2);
+      <div class="cutscene-content">
+        <div class="artCard">
+          <div class="artBig" id="slideArt">💞</div>
+          <div class="sticker" id="slideSticker">Love Hurts</div>
+        </div>
 
-        // === PARTICLE SYSTEM ===
-        function createParticle(x, y, color, vx, vy) {
-            particles.push({ x, y, vx, vy, life: 30, color, size: 4 });
-        }
+        <div class="textCard">
+          <h2 class="cut-h" id="slideTitle">Story</h2>
+          <p class="cut-p" id="slideDesc">Loading…</p>
+          <div class="actionLine" id="slideAction">Tap Next</div>
 
-        function createExplosion(x, y, color, count = 8) {
-            for (let i = 0; i < count; i++) {
-                const angle = (i / count) * Math.PI * 2;
-                const v = 3 + Math.random() * 2;
-                createParticle(x, y, color, Math.cos(angle) * v, Math.sin(angle) * v);
-            }
-            explosions.push({ x, y, radius: 0, maxRadius: 40, life: 20, color });
-        }
+          <div class="cut-nav">
+            <button class="cut-btn" id="prevBtn" onclick="prevSlide()">← Back</button>
+            <button class="cut-btn" id="nextBtn" onclick="nextSlide()">Next →</button>
+            <button class="cut-btn" onclick="closeCutscene(true)">Skip ✦</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        // === ENEMY SYSTEM ===
-        function spawnBaddies() {
-            const baseCount = 4 + level * 2;
-            for (let i = 0; i < baseCount; i++) {
-                const x = rand(40, W - 40);
-                const y = rand(-400, -50);
-                const type = level < 3 ? 'basic' : level < 5 ? 'split' : 'boss';
-                enemies.push({
-                    x, y, w: 28, h: 28, hp: type === 'basic' ? 1 : type === 'split' ? 2 : 5,
-                    spd: 1.5 + level * 0.3, type, angle: 0, shootCool: 0
-                });
-            }
-        }
+  <div id="overlay">
+    <div class="modal">
+      <div class="modalHeader">
+        <div class="mhTitle" id="modalTitle">🧿 Tonight</div>
+        <button class="closeX" onclick="closeOverlay()" aria-label="Close">✕</button>
+      </div>
 
-        // === CUTSCENE SYSTEM ===
-        const cutscenes = {
-            1: [
-                { art: '🎧', title: 'The DJ', desc: 'Spinning beats at Exit Bar...', action: 'I need to catch their eye!' },
-                { art: '💔', title: 'The Challenge', desc: 'But the dance floor is CHAOS...', action: 'Dodge & Impress!' },
-            ],
-            2: [
-                { art: '⚡', title: 'They Notice!', desc: 'The DJ looked in your direction!', action: 'Stay focused...' },
-                { art: '🎶', title: 'Tempo Rising', desc: 'The beat gets HARDER...', action: 'More enemies incoming!' },
-            ],
-            3: [
-                { art: '😍', title: 'Eye Contact!', desc: 'You locked eyes across the dance floor!', action: 'Almost there!' },
-                { art: '🔥', title: 'Peak Hour', desc: 'The crowd is WILD...', action: 'Chaos everywhere!' },
-            ],
-            4: [
-                { art: '💫', title: 'Moment of Truth', desc: 'The finals minutes before midnight...', action: 'Give it everything!' },
-                { art: '⭐', title: 'Last Stand', desc: 'One final wave of obstacles...', action: 'ALL IN!' },
-            ],
-            5: [
-                { art: '👑', title: 'VICTORY!', desc: 'You won their heart on the dance floor!', action: 'Saturday 2/13 🎉' },
-                { art: '💕', title: 'Exit Bar Ready', desc: 'See you this Saturday at 9PM!', action: '9PM–2AM • Get Down!' },
-            ]
-        };
+      <div class="modalBody">
+        <div class="flyerFrame">
+          <div class="flyerGlow"></div>
+          <iframe id="flyerFrame" loading="lazy" allowfullscreen="allowfullscreen" allow="fullscreen"
+            style="position:absolute; inset:0; width:100%; height:100%; border:0; margin:0; padding:0;"></iframe>
+        </div>
 
-        let currentSlide = 0;
-        let currentCutscene = 1;
+        <div class="promoCard">
+          <h3 id="promoH">Tonight's move</h3>
+          <p id="promoP">Loading…</p>
 
-        function showCutscene(n) {
-            if (!cutscenes[n]) return;
-            currentCutscene = n;
-            currentSlide = 0;
-            displaySlide();
-            document.getElementById('cutsceneContainer').classList.add('active');
-            gameActive = false;
-        }
+          <div class="promoActions">
+            <button class="btn primary" onclick="window.open(FLYER_CANVA_VIEW,'_blank')">Open Flyer</button>
+            <button class="btn" onclick="copyText(FLYER_CANVA_VIEW)">Copy Link</button>
+            <button class="btn" onclick="copyText(EVENT_ADDR)">Copy Address</button>
+            <button class="btn" onclick="copyText(EVENT_TIME)">Copy Time</button>
+          </div>
 
-        function displaySlide() {
-            const scene = cutscenes[currentCutscene] || [];
-            const slide = scene[currentSlide];
-            if (!slide) return;
+          <div class="tinyNote" id="promoNote"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-            document.getElementById('slideArt').textContent = slide.art;
-            document.getElementById('slideTitle').textContent = slide.title;
-            document.getElementById('slideDesc').textContent = slide.desc;
-            document.getElementById('slideAction').textContent = slide.action;
-            document.getElementById('slideNum').textContent = currentSlide + 1;
-            document.getElementById('slideTotal').textContent = scene.length;
+  <div id="toast"></div>
 
-            document.getElementById('prevBtn').disabled = currentSlide === 0;
-            document.getElementById('nextBtn').disabled = currentSlide === scene.length - 1;
+  <script>
+    const EVENT_DATE = "Saturday 2/14/26";
+    const EVENT_VENUE = "Exit Bar @ The Mandarin Hyde";
+    const EVENT_TIME = "9PM–2AM";
+    const EVENT_CITY = "DTSP";
+    const EVENT_ADDR = "475 Central Ave Unit 302, St Petersburg, FL 33701";
+    const GAME_LINK = "https://shiny-chainsaw-v6xr65jj57xh6955-8000.app.github.dev/";
 
-            // Auto-advance to next slide after 3 seconds
-            setTimeout(() => {
-                if (currentSlide < scene.length - 1) {
-                    currentSlide++;
-                    displaySlide();
-                } else {
-                    // Last slide - auto close and start game
-                    closeCutscene();
-                }
-            }, 3000);
-        }
+    const FLYER_CANVA_EMBED = "https://www.canva.com/design/DAHBChHGCjI/O_Z56ttD_h3b9AqWfAK6Rg/view?embed";
+    const FLYER_CANVA_VIEW = "https://www.canva.com/design/DAHBChHGCjI/UIEPyWbXS4XCztqQWg7Sdw/view?utm_content=DAHBChHGCjI&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=hf87a7a6838";
 
-        window.nextSlide = function() {
-            const scene = cutscenes[currentCutscene] || [];
+    const CUT_BG = [
+      "https://i.imgur.com/nYXtN5d.png",
+      "https://i.imgur.com/7ae31628-ac1d-496d-9f01-c3800f11cbe2.png"
+    ];
+
+    const ENEMY_AVATAR_URL = "https://i.imgur.com/cntbZL4.png";
+    let enemyAvatar = new Image();
+    let enemyAvatarLoaded = false;
+    enemyAvatar.onload = () => { enemyAvatarLoaded = true; };
+    enemyAvatar.src = ENEMY_AVATAR_URL;
+    
+    const PROMO_MESSAGES = [
+      "🍹 EXIT Bar Tonight! 9PM-2AM",
+      "💔 Love Hurts @ The Mandarin Hyde",
+      "📍 475 Central Ave - See you there!",
+      "🎮 Play the game. Find the connection.",
+      "🔥 Saturday 2/14/26 - Don't miss it!",
+      "🧿 Exit Bar @ The Mandarin Hyde DTSP"
+    ];
+    
+    let lastPromoTime = 0;
+    let promoInterval = 15000;
+
+    const isMobile = window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window || window.innerWidth < 768;
+    const isLowEnd = navigator.hardwareConcurrency ? navigator.hardwareConcurrency <= 4 : true;
+
+    const $ = (id) => document.getElementById(id);
+    const rand = (min, max) => Math.random() * (max - min) + min;
+    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+    const rectsCollide = (a, b) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+
+    function toast(msg) {
+      const t = $("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 2000);
+    }
+
+    function vibrate(pattern) {
+      if (navigator.vibrate && isMobile) {
+        navigator.vibrate(pattern);
+      }
+    }
+
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        toast("Copied ✨");
+        vibrate(50);
+      } catch (e) {
+        toast("Copy blocked — select & copy manually");
+      }
+    }
+
+    document.addEventListener("gesturestart", (e) => e.preventDefault(), { passive: false });
+    document.addEventListener("gesturechange", (e) => e.preventDefault(), { passive: false });
+    document.addEventListener("gestureend", (e) => e.preventDefault(), { passive: false });
+    document.addEventListener("touchmove", (e) => {
+      if (e.scale !== 1) e.preventDefault();
+    }, { passive: false });
+    
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', (e) => {
+      const now = Date.now();
+      if (now - lastTouchEnd <= 300) {
+        e.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, false);
+
+    function toggleMute() {
+      const v = $("bgVideo");
+      v.muted = !v.muted;
+      toast(v.muted ? "Video muted 🔇" : "Video unmuted 🔊");
+    }
+
+    const overlay = $("overlay");
+
+    function openOverlay(title, h, p, note) {
+      $("modalTitle").textContent = title;
+      $("promoH").textContent = h;
+      $("promoP").textContent = p;
+      $("promoNote").textContent = note || "";
+
+      const frame = $("flyerFrame");
+      if (frame) frame.src = FLYER_CANVA_EMBED;
+
+      overlay.classList.add("active");
+      vibrate(30);
+    }
+
+    function closeOverlay() {
+      overlay.classList.remove("active");
+      const frame = $("flyerFrame");
+      if (frame) frame.src = "about:blank";
+    }
+
+    function openFlyer() {
+      openOverlay(
+        "🧿 Flyer (Tonight)",
+        "Show this at the door",
+        `Tonight: ${EVENT_DATE} • ${EVENT_VENUE} • ${EVENT_TIME} • ${EVENT_CITY}.`,
+        "It's all about the game. Come play. 😉"
+      );
+    }
+
+    function openPromo(mode = "quick") {
+      if (mode === "quick") {
+        openOverlay(
+          "💘 How to Play",
+          "Connection in the crowd.",
+          "Move, shoot, build combos. The more you flow, the more the game flirts back.",
+          isMobile ? "Hold ◀/▶ to move, hold FIRE to shoot." : "Arrow keys/A,D to move, SPACE to shoot."
+        );
+      } else if (mode === "exitbar") {
+        openOverlay(
+          "🗓️ EXIT Bar @ The Mandarin Hyde",
+          "Love Hurts — Saturday 2/14/26",
+          `You're playing the official promo game for tonight's event.\n\n${EVENT_TIME}\n${EVENT_ADDR}\n\nDTSP's hottest Saturday night.\nConnection in the crowd.`,
+          "High scores get special treatment at the door 😏"
+        );
+      }
+    }
+
+    window.addEventListener("keydown", (e) => {
+      const k = e.key.toLowerCase();
+      if (k === "f") openFlyer();
+      if (k === "p") openPromo("quick");
+      if (k === "escape") { closeOverlay(); closeCutscene(false); }
+    });
+
+    const canvas = $("game");
+    const ctx = canvas.getContext("2d");
+    
+    const GAME_W = 980;
+    const GAME_H = 560;
+    
+    function resizeCanvas() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = rect.height + 'px';
+      
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      
+      ctx.scale((canvas.width / GAME_W), (canvas.height / GAME_H));
+    }
+    
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    let lives = 3, level = 1, score = 0, combo = 0, multiplier = 1;
+    let gameActive = false;
+    let gamePaused = false;
+
+    const player = { x: GAME_W / 2, y: GAME_H - 60, r: 20, spd: 7 };
+
+    let bullets = [], enemies = [], particles = [], explosions = [], pickups = [];
+    let screenShake = 0, hitFlash = 0;
+
+    const input = { left: false, right: false, shoot: false };
+    const keys = {};
+
+    window.addEventListener("keydown", e => { 
+      keys[e.key.toLowerCase()] = true;
+      if(["space","arrowup","arrowdown","arrowleft","arrowright"].indexOf(e.code.toLowerCase()) > -1) {
+        e.preventDefault();
+      }
+    });
+    window.addEventListener("keyup", e => { keys[e.key.toLowerCase()] = false; });
+
+    function updateUI() {
+      $("lives").textContent = lives;
+      $("level").textContent = level;
+      $("combo").textContent = combo;
+      $("score").textContent = score;
+      $("mult").textContent = multiplier + "x";
+    }
+
+    const btnLeft = $("btnLeft");
+    const btnRight = $("btnRight");
+    const shootPad = $("shootPad");
+
+    function bindHold(el, onDown, onUp) {
+      const down = (e) => { 
+        e.preventDefault(); 
+        e.stopPropagation();
+        onDown(); 
+      };
+      const up = (e) => { 
+        e.preventDefault();
+        e.stopPropagation();
+        onUp(); 
+      };
+
+      el.addEventListener("pointerdown", down, {passive: false});
+      el.addEventListener("pointerup", up, {passive: false});
+      el.addEventListener("pointercancel", up, {passive: false});
+      el.addEventListener("pointerleave", up, {passive: false});
+      el.addEventListener("touchstart", down, {passive: false});
+      el.addEventListener("touchend", up, {passive: false});
+    }
+
+    bindHold(btnLeft,
+      () => { input.left = true; btnLeft.classList.add("active"); vibrate(10); },
+      () => { input.left = false; btnLeft.classList.remove("active"); }
+    );
+
+    bindHold(btnRight,
+      () => { input.right = true; btnRight.classList.add("active"); vibrate(10); },
+      () => { input.right = false; btnRight.classList.remove("active"); }
+    );
+
+    bindHold(shootPad,
+      () => { input.shoot = true; shootPad.classList.add("active"); },
+      () => { input.shoot = false; shootPad.classList.remove("active"); }
+    );
+
+    function createParticle(x, y, color, vx, vy, life = 30, size = 3) {
+      particles.push({ x, y, vx, vy, life, color, size });
+    }
+    
+    function createExplosion(x, y, color, count = 10) {
+      const actualCount = isLowEnd ? Math.floor(count / 2) : count;
+      for (let i = 0; i < actualCount; i++) {
+        const a = (i / actualCount) * Math.PI * 2;
+        const v = 2.6 + Math.random() * 2.2;
+        createParticle(x, y, color, Math.cos(a) * v, Math.sin(a) * v, 30, 3);
+      }
+      explosions.push({ x, y, r: 0, max: 46, life: 22, color });
+    }
+
+    function spawnWave() {
+      const baseCount = 5 + level * 2;
+      for (let i = 0; i < baseCount; i++) {
+        const type = level < 3 ? "basic" : level < 5 ? "split" : "boss";
+        enemies.push({
+          x: rand(40, GAME_W - 40),
+          y: rand(-520, -60),
+          r: type === "boss" ? 18 : 12,
+          hp: type === "basic" ? 1 : type === "split" ? 2 : 6,
+          spd: 1.6 + level * 0.35,
+          type,
+          ang: rand(0, Math.PI * 2)
+        });
+      }
+    }
+
+    function maybeDropPickup(x, y) {
+      const chance = 0.12 + Math.min(0.10, combo / 120);
+      if (Math.random() < chance) {
+        const kinds = ["flyer", "clue", "kiss", "glitch"];
+        const kind = kinds[Math.floor(Math.random() * kinds.length)];
+        pickups.push({ x, y, r: 14, vy: 1.6, kind, t: 0 });
+      }
+    }
+
+    let shootCooldown = 0;
+    function shoot() {
+      vibrate(isMobile ? 15 : 5);
+      
+      const patterns = [
+        [{ dx: 0, dy: -1 }],
+        [{ dx: -0.28, dy: -1 }, { dx: 0, dy: -1 }, { dx: 0.28, dy: -1 }],
+        [{ dx: -0.46, dy: -1 }, { dx: -0.23, dy: -1 }, { dx: 0, dy: -1 }, { dx: 0.23, dy: -1 }, { dx: 0.46, dy: -1 }]
+      ];
+      const pat = patterns[Math.min(Math.floor(combo / 7), 2)];
+      pat.forEach(p => {
+        bullets.push({
+          x: player.x + p.dx * 14,
+          y: player.y - 18,
+          w: 6, h: 14,
+          vx: p.dx * 2.6,
+          vy: p.dy * 10,
+          life: 220
+        });
+      });
+      shootCooldown = isMobile ? 12 : 10;
+    }
+
+    const cutscenes = {
+      1: [
+        { art: "💞", sticker: "The Crowd", title: "The Room (Surreal)", desc: "The whole place moves like one organism. You don't chase — you sync.", action: "Tap Next." },
+        { art: "💋", sticker: "Eye Contact", title: "The Signal", desc: "A glance hits like bass. Play it cool. Let the moment lean in.", action: "Tap Next." }
+      ],
+      2: [
+        { art: "✨", sticker: "Chemistry", title: "Tempo Rises", desc: "Combos feel like flirting — quick, clean, electric.", action: "Build combos." },
+        { art: "🔥", sticker: "Closer", title: "Heat Check", desc: "The crowd compresses. Somebody's smiling at you like they already know.", action: "Stay in rhythm." }
+      ],
+      3: [
+        { art: "😍", sticker: "Two Beats", title: "Connection", desc: "For a second, the room disappears. It's just you… and them.", action: "Hold it." },
+        { art: "💘", sticker: "Don't Blink", title: "The Pull", desc: "Confidence is gravity. The game rewards calm hands.", action: "Clean run." }
+      ],
+      4: [
+        { art: "💫", sticker: "Wavy Time", title: "Midnight Physics", desc: "Everything bends. Hearts float. Your dodges look like dancing.", action: "One more wave." },
+        { art: "👑", sticker: "Final", title: "Last Wave", desc: "When it's loud, people reveal themselves. You just perform.", action: "All in." }
+      ],
+      5: [
+        { art: "💕", sticker: "EXIT Bar", title: "Victory!", desc: `You mastered the game.\n\nNow master the night.\n\n${EVENT_DATE}\n${EVENT_VENUE}\n${EVENT_TIME}\n${EVENT_CITY}\n\nBring your victory to EXIT Bar.`, action: "Get Details →" },
+        { art: "🍹", sticker: "Tonight", title: "EXIT Bar @ The Mandarin Hyde", desc: `Your final score: ${score}\n\nThe real game starts at 9PM.\n\n${EVENT_ADDR}\n\nShow this screen for VIP treatment.`, action: "Open Flyer →" },
+        { art: "🗞️", sticker: "Flyer", title: "Don't Forget", desc: "Screenshot this. Share it. Bring your friends.\n\nLove Hurts — but only if you don't show up.\n\nSee you tonight.", action: "Play Again" }
+      ]
+    };
+
+    let currentSlide = 0;
+    let currentCut = 1;
+    let cutTimer = null;
+
+    function showCutscene(n) {
+      currentCut = n;
+      currentSlide = 0;
+      $("cutsceneContainer").classList.add("active");
+      gameActive = false;
+      displaySlide(true);
+      vibrate([30, 50, 30]);
+    }
+
+    function displaySlide(resetTimer) {
+      const scene = cutscenes[currentCut] || [];
+      const s = scene[currentSlide];
+      if (!s) return;
+
+      $("slideArt").textContent = s.art;
+      $("slideTitle").textContent = s.title;
+      $("slideDesc").textContent = s.desc;
+      $("slideAction").textContent = s.action;
+      $("slideSticker").textContent = s.sticker || "Love Hurts";
+
+      $("slideNum").textContent = (currentSlide + 1);
+      $("slideTotal").textContent = scene.length;
+
+      $("prevBtn").disabled = currentSlide === 0;
+      $("nextBtn").disabled = currentSlide === scene.length - 1;
+
+      const bg = CUT_BG[(currentSlide + currentCut) % CUT_BG.length];
+      $("cutBg").style.backgroundImage = `url('${bg}')`;
+
+      if (resetTimer) {
+        if (cutTimer) clearTimeout(cutTimer);
+        const delay = isMobile ? 3500 : 2800;
+        cutTimer = setTimeout(() => {
+          if ($("cutsceneContainer").classList.contains("active")) {
             if (currentSlide < scene.length - 1) {
-                currentSlide++;
-                displaySlide();
+              currentSlide++;
+              displaySlide(true);
             } else {
-                closeCutscene();
+              closeCutscene(true);
+              if (currentCut === 5) openFlyer();
             }
-        };
+          }
+        }, delay);
+      }
+    }
 
-        window.prevSlide = function() {
-            if (currentSlide > 0) {
-                currentSlide--;
-                displaySlide();
-            }
-        };
+    window.nextSlide = function () {
+      if (currentCut === 0) return;
+      
+      vibrate(20);
+      const scene = cutscenes[currentCut] || [];
+      if (currentSlide < scene.length - 1) {
+        currentSlide++;
+        if (currentCut === 5 && currentSlide === 1) {
+          const s = cutscenes[5][1];
+          s.desc = `Your final score: ${score}\n\nThe real game starts at 9PM.\n\n${EVENT_ADDR}\n\nShow this screen for VIP treatment.`;
+        }
+        displaySlide(true);
+      } else {
+        closeCutscene(true);
+        if (currentCut === 5) {
+          openFlyer();
+          setTimeout(() => {
+            lives = 3; score = 0; combo = 0; level = 1;
+            startLevel(1);
+          }, 3000);
+        }
+      }
+    }
 
-        function closeCutscene() {
-            document.getElementById('cutsceneContainer').classList.remove('active');
-            gameActive = true;
+    window.prevSlide = function () {
+      if (currentCut === 0) return;
+      
+      vibrate(20);
+      if (currentSlide > 0) {
+        currentSlide--;
+        displaySlide(true);
+      }
+    }
+
+    function closeCutscene(startGame) {
+      if (cutTimer) clearTimeout(cutTimer);
+      $("cutsceneContainer").classList.remove("active");
+      if (startGame) {
+        gameActive = true;
+        gamePaused = false;
+      }
+    }
+
+    function startLevel(n) {
+      level = n;
+      combo = 0;
+      multiplier = 1;
+      bullets = [];
+      enemies = [];
+      pickups = [];
+      screenShake = 0;
+      player.x = GAME_W / 2;
+
+      spawnWave();
+      showCutscene(n);
+      
+      if (n === 1) {
+        setTimeout(() => openPromo('exitbar'), 2000);
+      } else if (n === 3) {
+        setTimeout(() => showExitBarFlyer(), 1500);
+      }
+    }
+    
+    function showExitBarFlyer() {
+      openOverlay(
+        "🗓️ EXIT Bar Tonight",
+        "Love Hurts — The Game",
+        `You're playing the promo game for:\n\n${EVENT_DATE}\n${EVENT_VENUE}\n${EVENT_TIME}\n${EVENT_CITY}\n\nReal connections happen offline. See you there.`,
+        "Show this screen at the door for a surprise 🎁"
+      );
+    }
+    
+    function showPeriodicPromo() {
+      if (!gameActive || $("cutsceneContainer").classList.contains("active")) return;
+      
+      const now = Date.now();
+      if (now - lastPromoTime > promoInterval) {
+        const msg = PROMO_MESSAGES[Math.floor(Math.random() * PROMO_MESSAGES.length)];
+        toast(msg);
+        
+        if (Math.random() < 0.33) {
+          setTimeout(() => showExitBarFlyer(), 2000);
+        }
+        
+        lastPromoTime = now;
+      }
+    }
+
+    function showGameOver() {
+      gameActive = false;
+      currentCut = 0;
+      currentSlide = 0;
+      $("cutsceneContainer").classList.add("active");
+      
+      $("slideArt").textContent = "🍹";
+      $("slideTitle").textContent = "Game Over — But The Night Continues";
+      $("slideDesc").textContent = `Score: ${score}\n\nDon't let the game end here.\n\n${EVENT_DATE}\n${EVENT_VENUE}\n${EVENT_TIME}\n${EVENT_ADDR}\n\nThe real connection happens at EXIT Bar tonight.`;
+      $("slideAction").textContent = "Tap Next to Continue to EXIT Bar →";
+      $("slideSticker").textContent = "See You Tonight";
+      $("slideNum").textContent = "1";
+      $("slideTotal").textContent = "2";
+      $("prevBtn").disabled = true;
+      $("nextBtn").disabled = false;
+      $("cutBg").style.backgroundImage = `url('${CUT_BG[0]}')`;
+
+      window.nextSlide = function () {
+        if (currentSlide === 0) {
+          currentSlide = 1;
+          $("slideArt").textContent = "💘";
+          $("slideTitle").textContent = "EXIT Bar @ The Mandarin Hyde";
+          $("slideDesc").textContent = `475 Central Ave Unit 302\nSt Petersburg, FL 33701\n\n9PM — 2AM\nSaturday 2/14/26\n\nShow this screen at the door.\nLove Hurts — but only if you don't show up.`;
+          $("slideAction").textContent = "Open Flyer →";
+          $("slideSticker").textContent = "Tonight";
+          $("slideNum").textContent = "2";
+          $("prevBtn").disabled = false;
+        } else {
+          $("cutsceneContainer").classList.remove("active");
+          openFlyer();
+          setTimeout(() => {
+            lives = 3; score = 0; combo = 0; level = 1;
+            startLevel(1);
+          }, 2000);
+        }
+      };
+      
+      vibrate([100, 50, 100]);
+    }
+
+    let last = performance.now();
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        gamePaused = true;
+      } else {
+        if (gameActive) gamePaused = false;
+        last = performance.now();
+      }
+    });
+
+    function loop(t) {
+      if (gamePaused) {
+        last = t;
+        requestAnimationFrame(loop);
+        return;
+      }
+
+      const dt = Math.min((t - last) / 16, 2);
+      last = t;
+
+      if (gameActive) {
+        showPeriodicPromo();
+        
+        input.left = input.left || keys["arrowleft"] || keys["a"];
+        input.right = input.right || keys["arrowright"] || keys["d"];
+        const wantsShoot = input.shoot || keys[" "];
+
+        if (input.left) player.x -= player.spd * dt;
+        if (input.right) player.x += player.spd * dt;
+        player.x = clamp(player.x, 26, GAME_W - 26);
+
+        if (shootCooldown > 0) shootCooldown -= 1 * dt;
+        if (wantsShoot && shootCooldown <= 0) shoot();
+        keys[" "] = false;
+
+        for (let i = bullets.length - 1; i >= 0; i--) {
+          const b = bullets[i];
+          b.x += b.vx * dt;
+          b.y += b.vy * dt;
+          b.life -= 1 * dt;
+          if (b.life <= 0 || b.y < -30) bullets.splice(i, 1);
         }
 
-        // === GAMEPLAY ===
-        function startLevel(n) {
-            level = n;
-            lives = Math.max(lives, 2);
-            combo = 0;
-            multiplier = 1;
-            score += level * 500;
-            updateUI();
+        enemies.forEach(e => {
+          e.y += e.spd * dt;
+          e.ang += 0.04 * dt;
+          e.x += Math.sin(e.ang) * (0.55 + level * 0.08) * dt;
+        });
+        enemies = enemies.filter(e => e.y < GAME_H + 60);
+
+        pickups.forEach(p => {
+          p.y += p.vy * dt;
+          p.t += 0.06 * dt;
+          p.x += Math.sin(p.t) * 0.8 * dt;
+        });
+        pickups = pickups.filter(p => p.y < GAME_H + 40);
+
+        for (let i = bullets.length - 1; i >= 0; i--) {
+          for (let j = enemies.length - 1; j >= 0; j--) {
+            const e = enemies[j];
+            const b = bullets[i];
+            const hit = rectsCollide(
+              { x: b.x - b.w / 2, y: b.y, w: b.w, h: b.h },
+              { x: e.x - e.r, y: e.y - e.r, w: e.r * 2, h: e.r * 2 }
+            );
+            if (hit) {
+              e.hp--;
+              score += 12 * multiplier;
+              combo++;
+              multiplier = 1 + Math.floor(combo / 10);
+              
+              if (combo === 10 || combo === 25 || combo === 50) {
+                toast(`🔥 ${combo} Combo! EXIT Bar Tonight!`);
+                if (combo === 25 && Math.random() > 0.5) {
+                  setTimeout(() => showExitBarFlyer(), 1500);
+                }
+              }
+              createExplosion(e.x, e.y, "#ff69b4", 8);
+              createParticle(b.x, b.y, "#ffdd57", rand(-1, 1), rand(-1, 1), 18, 3);
+              screenShake = Math.min(10, screenShake + 2);
+              vibrate(isMobile ? 20 : 5);
+
+              if (e.hp <= 0) {
+                if (e.type === "split") {
+                  enemies.push({ ...e, x: e.x - 18, hp: 1, r: 10, type: "basic" });
+                  enemies.push({ ...e, x: e.x + 18, hp: 1, r: 10, type: "basic" });
+                }
+                score += 60 * multiplier;
+                maybeDropPickup(e.x, e.y);
+                enemies.splice(j, 1);
+              }
+              bullets.splice(i, 1);
+              break;
+            }
+          }
+        }
+
+        const pBox = { x: player.x - player.r, y: player.y - player.r, w: player.r * 2, h: player.r * 2 };
+        for (let i = enemies.length - 1; i >= 0; i--) {
+          const e = enemies[i];
+          const eBox = { x: e.x - e.r, y: e.y - e.r, w: e.r * 2, h: e.r * 2 };
+          if (rectsCollide(pBox, eBox)) {
+            lives--;
+            combo = 0; multiplier = 1;
+            hitFlash = 10;
+            screenShake = 12;
+            createExplosion(player.x, player.y, "#ff1080", 14);
+            enemies.splice(i, 1);
+            vibrate(isMobile ? [50, 100, 50] : 50);
             
-            bullets = [];
-            enemies = [];
-            powerups = [];
-            screenShake = 0;
-            player.x = W / 2;
-            player.health = 100;
-
-            spawnBaddies();
-            showCutscene(n);
+            if (lives <= 0) { showGameOver(); }
+          }
         }
 
-        function updateUI() {
-            document.getElementById('lives').textContent = lives;
-            document.getElementById('level').textContent = level;
-            document.getElementById('combo').textContent = combo;
-            document.getElementById('score').textContent = score;
-            document.getElementById('mult').textContent = multiplier + 'x';
-        }
-
-        function shoot() {
-            const patterns = [
-                [{ dx: 0, dy: -1 }],
-                [{ dx: -0.3, dy: -1 }, { dx: 0, dy: -1 }, { dx: 0.3, dy: -1 }],
-                [{ dx: -0.5, dy: -1 }, { dx: -0.25, dy: -1 }, { dx: 0, dy: -1 }, { dx: 0.25, dy: -1 }, { dx: 0.5, dy: -1 }],
-            ];
-            
-            const pattern = patterns[Math.min(Math.floor(combo / 5), 2)];
-            pattern.forEach(p => {
-                bullets.push({
-                    x: player.x + p.dx * 10,
-                    y: player.y - 20,
-                    w: 6, h: 12,
-                    vx: p.dx * 2,
-                    vy: p.dy * 8,
-                    life: 300
-                });
-            });
-        }
-
-        // === MAIN LOOP ===
-        let lastTime = performance.now();
-        function gameLoop(t) {
-            const dt = Math.min((t - lastTime) / 16, 2);
-            lastTime = t;
-
-            if (gameActive) {
-                // INPUT
-                if (keys['arrowleft'] || keys['a']) player.x = Math.max(20, player.x - player.spd);
-                if (keys['arrowright'] || keys['d']) player.x = Math.min(W - 20, player.x + player.spd);
-                if (keys[' ']) { shoot(); delete keys[' ']; }
-
-                // UPDATE BULLETS
-                for (let i = bullets.length - 1; i >= 0; i--) {
-                    const b = bullets[i];
-                    b.x += b.vx * dt;
-                    b.y += b.vy * dt;
-                    b.life--;
-                    if (b.life <= 0 || b.y < -20) bullets.splice(i, 1);
-                }
-
-                // UPDATE ENEMIES
-                enemies.forEach(e => {
-                    e.y += e.spd * dt;
-                    e.angle += 0.05 * dt;
-                    e.shootCool--;
-                });
-                enemies = enemies.filter(e => e.y < H + 50);
-
-                // COLLISION: BULLETS vs ENEMIES
-                for (let i = bullets.length - 1; i >= 0; i--) {
-                    for (let j = enemies.length - 1; j >= 0; j--) {
-                        if (rectsCollide(bullets[i], enemies[j])) {
-                            enemies[j].hp--;
-                            score += 10 * multiplier;
-                            combo++;
-                            multiplier = 1 + Math.floor(combo / 10);
-                            createExplosion(enemies[j].x, enemies[j].y, '#ff69b4', 6);
-                            createParticle(bullets[i].x, bullets[i].y, '#ffbb00', 0, 0);
-
-                            if (enemies[j].hp <= 0) {
-                                if (enemies[j].type === 'split') {
-                                    enemies.push({ ...enemies[j], x: enemies[j].x - 15, hp: 1 });
-                                    enemies.push({ ...enemies[j], x: enemies[j].x + 15, hp: 1 });
-                                }
-                                score += 50 * multiplier;
-                                enemies.splice(j, 1);
-                            }
-
-                            bullets.splice(i, 1);
-                            screenShake = 4;
-                            break;
-                        }
-                    }
-                }
-
-                // COLLISION: PLAYER vs ENEMIES
-                const pBox = { x: player.x - 20, y: player.y - 20, w: 40, h: 40 };
-                for (let i = enemies.length - 1; i >= 0; i--) {
-                    if (rectsCollide(pBox, enemies[i])) {
-                        lives--;
-                        enemies.splice(i, 1);
-                        combo = 0;
-                        multiplier = 1;
-                        hitFlash = 10;
-                        screenShake = 8;
-                        createExplosion(player.x, player.y, '#ff1080', 12);
-                        if (lives <= 0) {
-                            gameActive = false;
-                            showGameOver();
-                        }
-                    }
-                }
-
-                // PARTICLES
-                for (let i = particles.length - 1; i >= 0; i--) {
-                    const p = particles[i];
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    p.life--;
-                    if (p.life <= 0) particles.splice(i, 1);
-                }
-
-                // LEVEL CLEAR
-                if (enemies.length === 0 && level < 5) {
-                    startLevel(level + 1);
-                } else if (enemies.length === 0 && level === 5) {
-                    gameActive = false;
-                    showCutscene(5);
-                }
+        for (let i = pickups.length - 1; i >= 0; i--) {
+          const p = pickups[i];
+          const pBox2 = { x: p.x - p.r, y: p.y - p.r, w: p.r * 2, h: p.r * 2 };
+          if (rectsCollide(pBox, pBox2)) {
+            vibrate([30, 30]);
+            if (p.kind === "flyer") { 
+              score += 180; 
+              openOverlay(
+                "🗓️ Save the Date",
+                "EXIT Bar @ The Mandarin Hyde",
+                `You found a flyer pickup!\n\n${EVENT_DATE}\n${EVENT_TIME}\n${EVENT_ADDR}\n\nLove Hurts — Saturday 2/14/26`,
+                "Bring your high score to the bar tonight!"
+              );
             }
-
-            updateUI();
-            draw(dt);
-            requestAnimationFrame(gameLoop);
+            else if (p.kind === "clue") { 
+              score += 220; 
+              openOverlay(
+                "💡 Pro Tip",
+                "How to win at EXIT Bar",
+                "Step 1: Show up tonight 9PM-2AM\nStep 2: Bring your confidence\nStep 3: Let the game guide you\n\nThe Mandarin Hyde, DTSP",
+                "It's all about the game."
+              );
+            }
+            else if (p.kind === "kiss") { 
+              score += 160; 
+              lives = Math.min(5, lives + 1); 
+              toast("💋 +1 life | Exit Bar Tonight!");
+            }
+            else if (p.kind === "glitch") { 
+              score += 260; 
+              toast("✨ Glitch bonus — See you at EXIT Bar!");
+            }
+            pickups.splice(i, 1);
+          }
         }
 
-        function draw(dt) {
-            ctx.fillStyle = '#0a0a0a';
-            ctx.fillRect(0, 0, W, H);
-
-            // BACKGROUND EFFECT
-            ctx.strokeStyle = 'rgba(255, 45, 149, 0.1)';
-            ctx.lineWidth = 0.5;
-            for (let i = 0; i < 10; i++) {
-                ctx.beginPath();
-                ctx.arc(W / 2, H / 2, 20 + i * 15, 0, Math.PI * 2);
-                ctx.stroke();
-            }
-
-            ctx.save();
-            if (screenShake > 0) {
-                ctx.translate(rand(-screenShake, screenShake), rand(-screenShake, screenShake));
-                screenShake *= 0.85;
-            }
-
-            // DRAW BULLETS
-            ctx.fillStyle = '#ffdd57';
-            bullets.forEach(b => {
-                ctx.fillRect(b.x - b.w / 2, b.y, b.w, b.h);
-                ctx.fillStyle = '#ffaa00';
-                ctx.beginPath();
-                ctx.arc(b.x, b.y, 3, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillStyle = '#ffdd57';
-            });
-
-            // DRAW ENEMIES
-            enemies.forEach(e => {
-                ctx.save();
-                ctx.translate(e.x + e.w / 2, e.y + e.h / 2);
-                ctx.rotate(e.angle);
-                
-                if (e.type === 'boss') {
-                    ctx.fillStyle = '#ff1080';
-                    ctx.beginPath();
-                    for (let i = 0; i < 6; i++) {
-                        const angle = (i / 6) * Math.PI * 2;
-                        const x = Math.cos(angle) * 16;
-                        const y = Math.sin(angle) * 16;
-                        if (i === 0) ctx.moveTo(x, y);
-                        else ctx.lineTo(x, y);
-                    }
-                    ctx.closePath();
-                    ctx.fill();
-                    ctx.font = 'bold 16px Arial';
-                    ctx.fillText('👑', -8, 6);
-                } else if (e.type === 'split') {
-                    ctx.fillStyle = '#ff69b4';
-                    ctx.beginPath();
-                    ctx.arc(0, 0, 12, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillStyle = '#fff';
-                    ctx.font = '12px Arial';
-                    ctx.fillText('💔', -6, 4);
-                } else {
-                    ctx.fillStyle = '#ff3b6b';
-                    ctx.beginPath();
-                    ctx.arc(0, 0, 10, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillStyle = '#fff';
-                    ctx.font = '10px Arial';
-                    ctx.fillText('❤', -3, 2);
-                }
-                ctx.restore();
-            });
-
-            // DRAW PLAYER
-            ctx.save();
-            if (hitFlash > 0) {
-                ctx.globalAlpha = 0.5 + Math.sin(hitFlash) * 0.5;
-                hitFlash--;
-            }
-            ctx.fillStyle = '#69f';
-            ctx.beginPath();
-            ctx.arc(player.x, player.y, 20, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.font = 'bold 24px Arial';
-            ctx.fillText('💘', player.x - 12, player.y + 9);
-            ctx.restore();
-
-            // DRAW PARTICLES
-            ctx.globalAlpha = 0.8;
-            particles.forEach(p => {
-                ctx.fillStyle = p.color;
-                ctx.globalAlpha = p.life / 30;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fill();
-            });
-
-            // DRAW EXPLOSIONS
-            explosions.forEach(e => {
-                ctx.strokeStyle = e.color;
-                ctx.globalAlpha = e.life / 20;
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
-                ctx.stroke();
-                e.radius += e.maxRadius / e.life;
-            });
-            explosions = explosions.filter(e => e.life-- > 0);
-
-            ctx.globalAlpha = 1;
-            ctx.restore();
-
-            // HUD CORNER TEXT
-            ctx.fillStyle = '#aaa';
-            ctx.font = '10px monospace';
-            ctx.fillText('Saturday 2/13/26 • Exit Bar • 9PM', 8, H - 8);
+        const maxParticles = isLowEnd ? 30 : 60;
+        if (particles.length > maxParticles) {
+          particles.splice(0, particles.length - maxParticles);
+        }
+        
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.life -= 1 * dt;
+          if (p.life <= 0) particles.splice(i, 1);
         }
 
-        function showGameOver() {
-            currentCutscene = 0;
-            currentSlide = 0;
-            document.getElementById('slideArt').textContent = '😭';
-            document.getElementById('slideTitle').textContent = 'Game Over!';
-            document.getElementById('slideDesc').textContent = `You scored ${score} points! The DJ will remember you... come back stronger!`;
-            document.getElementById('slideAction').textContent = '❌ Try Again';
-            document.getElementById('prevBtn').disabled = true;
-            document.getElementById('nextBtn').textContent = 'Play Again';
-            document.getElementById('nextBtn').disabled = false;
-            document.getElementById('slideNum').style.display = 'none';
-            document.getElementById('slideTotal').style.display = 'none';
-            document.getElementById('cutsceneContainer').classList.add('active');
-        }
-
-        // START GAME
-        startLevel(1);
-        requestAnimationFrame(gameLoop);
-    </script>
-</body>
-</html>
+        for
